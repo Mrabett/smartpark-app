@@ -19,7 +19,6 @@ jobs:
   build-frontend:
     name: Build Frontend (Angular)
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -51,7 +50,6 @@ jobs:
   build-backend:
     name: Build Backend (Spring Boot)
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -81,18 +79,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-frontend, build-backend]
     if: github.ref == 'refs/heads/main'
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download frontend artifact
+      - name: Download Frontend dist
         uses: actions/download-artifact@v4
         with:
           name: frontend-dist
           path: frontend/dist/
 
-      - name: Download backend artifact
+      - name: Download Backend JAR
         uses: actions/download-artifact@v4
         with:
           name: backend-jar
@@ -126,53 +123,32 @@ jobs:
             ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
 
   # ══════════════════════════════════════
-  # JOB 4 : DEPLOY TO KUBERNETES
+  # JOB 4 : DEPLOY TO KUBERNETES (SELF-HOSTED)
   # ══════════════════════════════════════
   deploy-kubernetes:
     name: Deploy to Kubernetes (OpenStack)
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [docker-build-push]
     if: github.ref == 'refs/heads/main'
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup SSH key
+      - name: Deploy to K8s
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.K8S_SSH_KEY }}" > ~/.ssh/k8s-key
-          chmod 600 ~/.ssh/k8s-key
-          ssh-keyscan -H 192.168.1.131 >> ~/.ssh/known_hosts
+          cd k8s/
+          kubectl apply -f 00-namespace.yaml
+          kubectl apply -f 01-configmap.yaml
+          kubectl apply -f 02-secret.yaml
+          kubectl apply -f 03-mongodb.yaml
+          kubectl apply -f 04-backend.yaml
+          kubectl apply -f 05-frontend.yaml
+          kubectl apply -f 06-hpa.yaml
+          # Redémarrage pour forcer la mise à jour des images
+          kubectl rollout restart deployment/smartpark-backend -n smartpark
+          kubectl rollout restart deployment/smartpark-frontend -n smartpark
 
-      - name: Copy K8s manifests to Master
+      - name: Verify status
         run: |
-          scp -i ~/.ssh/k8s-key -r k8s/ \
-            ubuntu@192.168.1.131:~/smartpark-k8s-ci/
-
-      - name: Deploy to Kubernetes
-        run: |
-          ssh -i ~/.ssh/k8s-key ubuntu@192.168.1.131 '
-            cd ~/smartpark-k8s-ci
-            kubectl apply -f 00-namespace.yaml
-            kubectl apply -f 01-configmap.yaml
-            kubectl apply -f 02-secret.yaml
-            kubectl apply -f 03-mongodb.yaml
-            kubectl apply -f 04-backend.yaml
-            kubectl apply -f 05-frontend.yaml
-            kubectl apply -f 06-hpa.yaml
-            kubectl rollout restart deployment/smartpark-backend -n smartpark
-            kubectl rollout restart deployment/smartpark-frontend -n smartpark
-            echo "Deployment done!"
-            kubectl get pods -n smartpark
-          '
-
-      - name: Verify deployment
-        run: |
-          ssh -i ~/.ssh/k8s-key ubuntu@192.168.1.131 '
-            kubectl rollout status deployment/smartpark-backend \
-              -n smartpark --timeout=300s
-            kubectl rollout status deployment/smartpark-frontend \
-              -n smartpark --timeout=120s
-            echo "All deployments successful!"
-          '
+          kubectl get pods -n smartpark
+          kubectl rollout status deployment/smartpark-backend -n smartpark --timeout=120s
