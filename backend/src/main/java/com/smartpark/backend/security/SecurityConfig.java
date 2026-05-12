@@ -2,6 +2,7 @@ package com.smartpark.backend.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -26,19 +27,16 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http)
-            throws Exception {
-
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsSource()))
                 .sessionManagement(sm -> sm
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
                 .authorizeHttpRequests(auth -> auth
-
-                        // ✅ Routes publiques
+                        // ✅ Routes publiques (Accessibles sans login)
                         .requestMatchers(
+                                "/register",
                                 "/api/auth/**",
                                 "/api/auth/marketplace/**",
                                 "/api/terrains/**",
@@ -54,17 +52,14 @@ public class SecurityConfig {
                                 "/api/remises/**"
                         ).permitAll()
 
-                        // ✅ Route protégée (AJOUTÉE ICI)
-                        .requestMatchers("/api/matchs/**")
-                        .hasAnyRole("ADMIN", "USER")
+                        // ✅ Routes protégées par rôle
+                        .requestMatchers("/api/matchs/**").hasAnyRole("ADMIN", "USER")
 
                         // 🔒 Toutes les autres routes nécessitent authentification
                         .anyRequest().authenticated()
                 )
-
-                // 🔐 Filtre JWT
-                .addFilterBefore(jwtFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+                // 🔐 Filtre JWT pour valider le token après connexion
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -77,15 +72,15 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(
-                List.of("http://localhost:4200"));
-        config.setAllowedMethods(
-                List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
+        
+        // ✅ CORRECTION : Autorise toutes les origines pour le développement sur OpenStack
+        config.setAllowedOriginPatterns(List.of("*")); 
+        
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
