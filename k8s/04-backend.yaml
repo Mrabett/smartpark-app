@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: mrabethedi0/smartpark-backend:latest
+          image: mrabethedi0/smartpark-backend:v2
+          imagePullPolicy: Always
           ports:
             - containerPort: 8082
           envFrom:
