@@ -1,10 +1,10 @@
 ﻿# ═══════════════════════════════════════════
 # STAGE 1 - MAVEN BUILD
 # ═══════════════════════════════════════════
-FROM eclipse-temurin:17-jdk-alpine AS builder
+FROM maven:3.9-eclipse-temurin-17-alpine AS builder
 WORKDIR /app
 COPY pom.xml .
-RUN mvn dependency:go-offline -B -q 2>/dev/null || true
+RUN mvn dependency:go-offline -B -q
 COPY src ./src
 RUN mvn package -DskipTests -q
 RUN java -Djarmode=layertools -jar target/*.jar extract
