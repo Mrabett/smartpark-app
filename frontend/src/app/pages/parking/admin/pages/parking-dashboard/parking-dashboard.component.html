@@ -1,0 +1,215 @@
+<app-detection-popup></app-detection-popup>
+<div class="sp-page container">
+  <div class="sp-hero">
+    <div>
+      <h1 class="sp-hero-title">Gestion des Flux <span>Parking</span></h1>
+      <div class="sp-hero-sub">
+        <div class="live-dot"></div>
+        Contrôle en temps réel des terminaux
+      </div>
+    </div>
+    <div class="dashboard-header">
+      <h2>Tableau de bord - Employé</h2>
+
+      <mat-form-field appearance="outline" class="parking-selector">
+        <mat-label>📍 Choisir mon lieu de travail</mat-label>
+        <mat-select [value]="parkingSelectionne" (selectionChange)="onParkingChange($event.value)">
+          <mat-option *ngFor="let p of parkings" [value]="p.id">
+            {{ p.nom }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <app-detection-popup></app-detection-popup>
+
+    <div class="sp-hero-actions">
+      <button class="sp-btn secondary" routerLink="/admin/recettes">
+        <mat-icon>account_balance_wallet</mat-icon> Statistiques Recettes
+      </button>
+      <button class="sp-btn ghost" (click)="toggleCamera()">
+        <mat-icon>qr_code_scanner</mat-icon> {{ isCameraOpen ? 'Arrêter Scan' : 'Scanner Ticket' }}
+      </button>
+      <button class="sp-btn primary" (click)="openAdd()">
+        <mat-icon>add</mat-icon> Nouveau Parking
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isCameraOpen" class="scanner-container"
+    style="background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 20px; height: 300px;">
+    <zxing-scanner [device]="currentDevice" (scanSuccess)="onTicketScanned($event)"
+      (camerasFound)="onCamerasFound($event)"></zxing-scanner>
+  </div>
+
+  <div *ngIf="isLoadingTicket" style="text-align: center; margin: 20px;">
+    <mat-spinner diameter="40" style="margin: auto;"></mat-spinner>
+    <p>Recherche du ticket...</p>
+  </div>
+
+  <div *ngIf="ticketData" class="ticket-overlay" style="margin-bottom: 30px; display: flex; justify-content: center;">
+    <mat-card class="ticket-card" style="width: 100%; max-width: 500px; border-radius: 20px; border: 2px solid"
+      [style.borderColor]="alerteIncoherence ? '#f44336' : (etatTicket === 'TERMINE' ? '#777' : '#4caf50')">
+
+      <div *ngIf="alerteIncoherence" style="background: #f44336; color: white; padding: 15px; text-align: center;">
+        <mat-icon style="vertical-align: middle;">report_problem</mat-icon>
+        <strong> ALERTE SÉCURITÉ : VÉHICULE NON IDENTIQUE</strong>
+      </div>
+
+      <div *ngIf="!alerteIncoherence && etatTicket === 'TERMINE'"
+        style="background: #777; color: white; padding: 15px; text-align: center;">
+        <mat-icon style="vertical-align: middle;">error</mat-icon>
+        <strong>TICKET DÉJÀ UTILISÉ LE {{ ticketData.updatedAt | date:'dd/MM à HH:mm' }}</strong>
+      </div>
+
+      <div *ngIf="!alerteIncoherence && etatTicket !== 'TERMINE'"
+        style="background: #4caf50; color: white; padding: 15px; text-align: center;">
+        <mat-icon style="vertical-align: middle;">check_circle</mat-icon>
+        <strong>TICKET VALIDE - MODE {{ etatTicket === 'A_ENTRER' ? 'ENTRÉE' : 'SORTIE' }}</strong>
+      </div>
+
+      <mat-card-content style="padding: 25px;">
+
+        <div *ngIf="ticketData.voitureMarque"
+          style="background: #f0f7ff; border-radius: 12px; padding: 12px; margin-bottom: 20px; border: 1px solid #bbdefb; display: flex; align-items: center; gap: 15px;">
+          <mat-icon color="primary">directions_car</mat-icon>
+          <div>
+            <span style="font-size: 0.7rem; color: #1976d2; font-weight: bold; text-transform: uppercase;">Signature IA
+              détectée</span>
+            <div style="font-weight: bold; color: #333;">{{ ticketData.voitureMarque }} • {{ ticketData.voitureCouleur
+              }}</div>
+          </div>
+          <span *ngIf="ticketData.spontane"
+            style="margin-left: auto; background: #ff9800; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">
+            🤖 IA SPONTANÉ
+          </span>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 20px;">
+          <span style="color: #888; text-transform: uppercase; font-size: 0.75rem;">Véhicule scanné</span>
+          <h2 style="font-size: 2.8rem; margin: 0; letter-spacing: 4px; color: #222; font-weight: 800;">
+            {{ ticketData.matricule | uppercase }}
+          </h2>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div
+          style="display: flex; justify-content: space-between; margin-top: 20px; background: #f9f9f9; padding: 10px; border-radius: 8px;">
+          <div>
+            <p style="margin:0; font-size: 0.75rem; color: #777;">Prévu Entrée</p>
+            <strong>{{ ticketData.datetimeEntree | date:'dd/MM HH:mm' }}</strong>
+          </div>
+          <div style="text-align: right;">
+            <p style="margin:0; font-size: 0.75rem; color: #777;">Prévu Sortie</p>
+            <strong>{{ ticketData.datetimeSortie | date:'dd/MM HH:mm' }}</strong>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <div *ngIf="fraisDepassement > 0"
+            style="background: #fff3e0; border-left: 5px solid #ff9800; padding: 12px; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-between;">
+            <span style="color: #e65100; font-weight: 600;">⚠️ Majoration (Retard: {{retardMinutes}} min)</span>
+            <strong style="color: #e65100;">+{{fraisDepassement | number:'1.2-2'}} TND</strong>
+          </div>
+          <div *ngIf="remiseRetard > 0"
+            style="background: #e1f5fe; border-left: 5px solid #03a9f4; padding: 12px; border-radius: 4px; display: flex; justify-content: space-between;">
+            <span style="color: #01579b; font-weight: 600;">ℹ️ Remise (Arrivée en avance)</span>
+            <strong style="color: #01579b;">-{{remiseRetard | number:'1.2-2'}} TND</strong>
+          </div>
+        </div>
+
+        <div
+          style="background: #111; color: #4fc3f7; padding: 15px; border-radius: 12px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; flex-direction: column;">
+            <span style="font-size: 0.85rem; color: #b0bec5; font-weight: bold;">TOTAL À ENCAISSER</span>
+            <span style="font-size: 0.70rem; color: #78909c;">(Temps réel)</span>
+          </div>
+          <span style="font-size: 2rem; font-weight: 900; color: #00e676;">{{montantTotalFinal | number:'1.2-2'}}
+            TND</span>
+        </div>
+
+        <div *ngIf="alerteIncoherence"
+          style="margin-top: 15px; color: #f44336; font-size: 0.85rem; text-align: center; font-weight: bold; border: 1px dashed #f44336; padding: 10px; border-radius: 8px;">
+          ATTENTION : La signature visuelle ne correspond pas !
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions align="end" style="padding: 15px; background: #f1f1f1;">
+        <button mat-stroked-button color="warn" (click)="fermerTicket()">FERMER</button>
+        <button mat-raised-button color="primary" *ngIf="etatTicket !== 'TERMINE'" (click)="validerTicket()"
+          style="padding: 0 35px; font-weight: bold;">
+          VALIDER {{ etatTicket === 'A_ENTRER' ? 'ENTRÉE' : 'SORTIE' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <div class="sp-filters" style="margin-bottom: 20px;">
+    <div class="sp-search" style="flex: 2; max-width: 400px;">
+      <mat-icon class="si">search</mat-icon>
+      <input [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()" placeholder="Rechercher un parking...">
+    </div>
+    <div class="sp-search" style="flex: 1; max-width: 250px;">
+      <mat-icon class="si">filter_list</mat-icon>
+      <select [(ngModel)]="selectedType" (ngModelChange)="applyFilters()"
+        style="background: transparent; border: none; color: var(--text); outline: none; flex: 1; font-family: 'DM Sans', sans-serif;">
+        <option value="" style="background: var(--bg2);">Tous les types</option>
+        <option *ngFor="let t of parkingTypes" [value]="t" style="background: var(--bg2);">{{t}}</option>
+      </select>
+    </div>
+  </div>
+
+  <div *ngIf="filteredParkings.length === 0 && !isLoadingTicket" class="sp-empty-state"
+    style="text-align: center; padding: 60px; background: var(--bg2); border-radius: 12px; border: 1px dashed var(--border); margin-top: 20px;">
+    <mat-icon
+      style="font-size: 4rem; width: auto; height: auto; color: var(--text3); opacity: 0.3;">domain_disabled</mat-icon>
+    <h3 style="color: var(--text2); margin-top: 15px;">Aucun parking trouvé</h3>
+    <p style="color: var(--text3);">Commencez par ajouter un parking ou vérifiez vos filtres.</p>
+  </div>
+
+  <div class="sp-tbl-wrap" *ngIf="filteredParkings.length > 0">
+    <table mat-table [dataSource]="filteredParkings" class="sp-tbl" style="width: 100%;">
+      <ng-container matColumnDef="nom">
+        <th mat-header-cell *matHeaderCellDef> Nom </th>
+        <td mat-cell *matCellDef="let e" style="font-weight: 700;"> {{e.nom}} </td>
+      </ng-container>
+      <ng-container matColumnDef="typeParking">
+        <th mat-header-cell *matHeaderCellDef> Type </th>
+        <td mat-cell *matCellDef="let e">
+          <span class="sp-badge" [ngClass]="e.typeParking === 'VOITURE' ? 'blue' : 'purple'">{{e.typeParking}}</span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="prixInitial">
+        <th mat-header-cell *matHeaderCellDef> Prix </th>
+        <td mat-cell *matCellDef="let e"> {{e.prixInitial}} TND </td>
+      </ng-container>
+      <ng-container matColumnDef="prixPromos">
+        <th mat-header-cell *matHeaderCellDef> Promo </th>
+        <td mat-cell *matCellDef="let e">
+          <span *ngIf="e.prixPromos < e.prixInitial" class="sp-badge green">{{e.prixPromos}} TND</span>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="spotsCount">
+        <th mat-header-cell *matHeaderCellDef> Spots </th>
+        <td mat-cell *matCellDef="let e"> {{e.spots?.length || 0}} </td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef style="text-align: right;"> Actions </th>
+        <td mat-cell *matCellDef="let e" style="text-align: right; white-space: nowrap;">
+          <button mat-icon-button (click)="openSpotManager(e)"
+            style="color: var(--green);"><mat-icon>map</mat-icon></button>
+          <button mat-icon-button (click)="viewReservations(e)"
+            style="color: var(--blue);"><mat-icon>list_alt</mat-icon></button>
+          <button mat-icon-button (click)="openRemiseDialog(e)"
+            style="color: var(--amber);"><mat-icon>local_offer</mat-icon></button>
+          <button mat-icon-button (click)="openEdit(e)" style="color: var(--text2);"><mat-icon>edit</mat-icon></button>
+          <button mat-icon-button (click)="deleteParking(e.id)"
+            style="color: var(--red);"><mat-icon>delete</mat-icon></button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+</div>

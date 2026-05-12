@@ -1,0 +1,72 @@
+<div class="sp-card" style="margin: 0; border: none; border-radius: 0; background: var(--bg); max-height: 90vh; overflow-y: auto;">
+  <div class="section-header">
+    <h2 class="section-title">
+      <div class="logo-icon" style="width: 28px; height: 28px; font-size: 14px; margin-right: 10px;">
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: white;">local_parking</mat-icon>
+      </div>
+      {{ data ? 'Modifier le Parking' : 'Nouveau Parking' }}
+    </h2>
+    <button class="btn btn-ghost" style="padding: 5px;" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="parkingForm" class="form-container">
+    <div class="sp-field">
+      <label class="form-label">Nom du Parking</label>
+      <input type="text" class="form-input" formControlName="nom" [class.invalid]="parkingForm.get('nom')?.invalid && parkingForm.get('nom')?.touched">
+      <small class="error-text" *ngIf="parkingForm.get('nom')?.invalid && parkingForm.get('nom')?.touched">Le nom est obligatoire</small>
+    </div>
+
+    <div class="sp-field">
+      <label class="form-label">Type (Filtre Spots)</label>
+      <select class="form-input" formControlName="typeParking">
+        <option *ngFor="let type of typeOptions" [value]="type">{{ type }}</option>
+      </select>
+    </div>
+
+    <div class="sp-field">
+      <label class="form-label">Description</label>
+      <textarea class="form-input" formControlName="description" rows="2"></textarea>
+    </div>
+
+    <div style="display: flex; gap: 15px;">
+      <div class="sp-field" style="flex: 1;">
+        <label class="form-label">Prix Initial (TND)</label>
+        <input type="number" class="form-input" formControlName="prixInitial" [class.invalid]="parkingForm.get('prixInitial')?.invalid && parkingForm.get('prixInitial')?.touched">
+        <small class="error-text" *ngIf="parkingForm.get('prixInitial')?.invalid && parkingForm.get('prixInitial')?.touched">Prix positif requis</small>
+      </div>
+      <div class="sp-field" style="flex: 1;">
+        <label class="form-label">Prix Promo (TND)</label>
+        <input type="number" class="form-input" formControlName="prixPromos">
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 15px;">
+      <div class="sp-field" style="flex: 1;">
+        <label class="form-label">Date Début Promo</label>
+        <input type="date" class="form-input" formControlName="dateDebutPromos">
+      </div>
+      <div class="sp-field" style="flex: 1;">
+        <label class="form-label">Date fin promo</label>
+        <input type="date" class="form-input" formControlName="dateFinPromos">
+        <div *ngIf="parkingForm.hasError('dateRangeInvalid')" style="color: var(--red); font-size: 0.75rem; margin-top: 4px;">
+          La date de fin doit être après la date de début.
+        </div>
+      </div>
+    </div>
+
+    <div class="sp-field" style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+      <input type="checkbox" formControlName="isEvent" id="isEventToggle" style="width: 18px; height: 18px; accent-color: var(--green);">
+      <label class="form-label" for="isEventToggle" style="margin: 0; text-transform: none;">Activer le mode Événement</label>
+    </div>
+  </form>
+
+  <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+    <button class="btn btn-secondary" (click)="close()">Annuler</button>
+    <button class="btn btn-primary" (click)="save()" [disabled]="parkingForm.invalid">
+      <mat-icon style="font-size: 18px; width: 18px; height: 18px; margin-right: 4px;">save</mat-icon>
+      {{ data ? 'Mettre à jour' : 'Créer' }}
+    </button>
+  </div>
+</div>

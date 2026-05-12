@@ -1,0 +1,706 @@
+<div class="user-page">
+
+
+  <div class="page-content">
+
+    <div class="sp-hero anim-fade-up">
+      <div>
+        <h1>Matchs <span>Disponibles</span></h1>
+        <p>
+          <span class="live-dot"></span>
+          {{ matchs.length }} match(s) disponible(s)
+        </p>
+      </div>
+      <a routerLink="/user/creer-match"
+         class="btn btn-primary">
+        ➕ Créer un match
+      </a>
+    </div>
+
+    <div *ngIf="message" class="alert"
+         [class.alert-success]="messageType==='success'"
+         [class.alert-danger]="messageType==='error'"
+         style="margin-bottom:1rem">
+      {{ message }}
+    </div>
+
+    <!-- ONGLETS -->
+    <div class="onglets-row">
+      <button class="btn-filtre"
+              [class.active]="onglet === 'tous'"
+              (click)="onglet='tous'; load()">
+        🌍 Tous les matchs
+        <span class="filtre-count">
+          {{ matchs.length }}
+        </span>
+      </button>
+      <button class="btn-filtre"
+              [class.active]="onglet === 'mes-matchs'"
+              (click)="onglet='mes-matchs'; load()">
+        👤 Mes matchs
+        <span class="filtre-count">
+          {{ mesMatchs.length }}
+        </span>
+      </button>
+    </div>
+
+    <!-- ─── TOUS LES MATCHS ─── -->
+    <div *ngIf="onglet === 'tous'">
+
+      <div class="filtres-row"
+           style="margin-bottom:1.5rem">
+        <button *ngFor="let s of sports"
+                class="btn-filtre"
+                [class.active]="filtreSport === s.value"
+                (click)="filtrer(s.value)">
+          {{ s.label }}
+        </button>
+      </div>
+
+      <div *ngIf="loading" class="empty-state">
+        <div class="empty-icon">⏳</div>
+        <p>Chargement des matchs...</p>
+      </div>
+
+      <div *ngIf="!loading && matchsFiltres.length===0"
+           class="empty-state">
+        <div class="empty-icon">⚽</div>
+        <h3>Aucun match disponible</h3>
+        <p>Soyez le premier à créer un match !</p>
+        <a routerLink="/user/creer-match"
+           class="btn btn-primary"
+           style="margin-top:1rem">
+          ➕ Créer un match
+        </a>
+      </div>
+
+      <div class="matchs-grid"
+           *ngIf="!loading && matchsFiltres.length > 0">
+        <div class="match-card anim-fade-up"
+             *ngFor="let m of matchsFiltres">
+
+          <!-- ✅ Bannière liste d'attente -->
+          <div class="attente-banner"
+               *ngIf="m.estEnAttente">
+            <span>⏳</span>
+            <span>
+              {{ getPositionLabel(m.positionAttente || 1) }}
+              — Vous serez averti si une place se libère
+            </span>
+          </div>
+
+          <div class="mc-header">
+            <div class="mc-sport-icon">
+              {{ getSportIcon(m.sport) }}
+            </div>
+            <div class="mc-header-info">
+              <div class="mc-titre">{{ m.titre }}</div>
+              <div class="mc-format">{{ m.format }}</div>
+            </div>
+            <span class="badge"
+                  [ngClass]="getStatutBadge(m.statut||'')">
+              {{ m.statut }}
+            </span>
+          </div>
+
+          <div class="mc-infos">
+            <div class="mc-info-item">
+              <span class="mci-icon">📅</span>
+              <span>{{ m.date }}</span>
+            </div>
+            <div class="mc-info-item">
+              <span class="mci-icon">🕐</span>
+              <span>{{ m.heure }}</span>
+            </div>
+            <div class="mc-info-item"
+                 *ngIf="m.terrainNom">
+              <span class="mci-icon">🏟️</span>
+              <span>{{ m.terrainNom }}</span>
+            </div>
+            <div class="mc-info-item">
+              <span class="mci-icon">📊</span>
+              <span class="badge"
+                    [ngClass]="getNiveauBadge(m.niveau)">
+                {{ m.niveau }}
+              </span>
+            </div>
+          </div>
+
+          <div class="mc-createur">
+            <div class="mc-cr-avatar">
+              {{ getInitiale(m.createurNom||'') }}
+            </div>
+            <span>Créé par {{ m.createurNom }}</span>
+            <span class="badge badge-purple"
+                  *ngIf="m.estCreateur">Vous</span>
+          </div>
+
+          <!-- BARRE JOUEURS -->
+          <div class="mc-joueurs-section">
+            <div class="mc-joueurs-header">
+              <span class="mc-joueurs-label">
+                👥 Joueurs
+              </span>
+              <span class="mc-joueurs-count">
+                <strong style="color:var(--green)">
+                  {{ m.nbJoueursActuel }}
+                </strong>
+                /{{ m.nbJoueursMax }}
+                <span style="color:var(--muted)"
+                      *ngIf="m.placesRestantes > 0">
+                  · {{ m.placesRestantes }} place(s)
+                </span>
+                <span style="color:var(--red)"
+                      *ngIf="m.placesRestantes === 0">
+                  · Complet
+                </span>
+              </span>
+            </div>
+            <div class="mc-progress">
+              <div class="mc-progress-fill"
+                   [style.width]="getPct(m) + '%'"
+                   [style.background]="
+                     m.placesRestantes === 0
+                     ? 'var(--red)' : 'var(--green)'">
+              </div>
+            </div>
+
+            <!-- ✅ Liste d'attente indicator -->
+            <div class="attente-indicator"
+                 *ngIf="(m.nbAttente || 0) > 0">
+              <span class="ai-dot"></span>
+              <span>
+                {{ m.nbAttente }}
+                personne(s) en liste d'attente
+              </span>
+            </div>
+
+            <div class="mc-avatars-row">
+              <div class="mc-avatars">
+                <div class="mc-avatar-item"
+                     *ngFor="let j of
+                       m.joueurs?.slice(0,4)">
+                  {{ getInitialesEmail(j) }}
+                </div>
+                <div class="mc-avatar-more"
+                     *ngIf="(m.joueurs?.length||0)>4">
+                  +{{ (m.joueurs?.length||0) - 4 }}
+                </div>
+              </div>
+              <button class="btn-voir-joueurs"
+                      (click)="ouvrirDetail(m)">
+                👥 Voir les joueurs
+              </button>
+            </div>
+          </div>
+
+          <p *ngIf="m.description"
+             class="mc-description">
+            {{ m.description }}
+          </p>
+
+          <!-- ACTIONS -->
+          <div class="mc-actions">
+
+            <!-- Créateur -->
+            <button *ngIf="m.estCreateur"
+                    class="btn btn-danger btn-sm"
+                    (click)="annuler(m.id!)">
+              🚫 Annuler le match
+            </button>
+
+            <!-- Pas inscrit + place dispo -->
+            <button *ngIf="!m.estInscrit
+                        && !m.estCreateur
+                        && !m.estEnAttente
+                        && m.statut === 'OUVERT'"
+                    class="btn btn-primary"
+                    (click)="rejoindre(m.id!)">
+              ➕ Rejoindre
+            </button>
+
+            <!-- ✅ Pas inscrit + match COMPLET -->
+            <!-- → rejoindre = s'inscrire en attente -->
+            <button *ngIf="!m.estInscrit
+                        && !m.estCreateur
+                        && !m.estEnAttente
+                        && m.statut === 'COMPLET'"
+                    class="btn btn-attente"
+                    (click)="rejoindre(m.id!)">
+              ⏳ Rejoindre la liste d'attente
+            </button>
+
+            <!-- Inscrit + pas créateur → quitter -->
+            <button *ngIf="m.estInscrit
+                        && !m.estCreateur"
+                    class="btn btn-secondary btn-sm"
+                    (click)="quitter(m.id!)">
+              🚪 Quitter
+            </button>
+
+            <!-- ✅ En attente → quitter l'attente -->
+            <button *ngIf="m.estEnAttente"
+                    class="btn btn-ghost btn-sm"
+                    (click)="quitterAttente(m.id!)">
+              ✕ Quitter l'attente
+            </button>
+
+            <!-- Badge inscrit -->
+            <span *ngIf="m.estInscrit"
+                  class="badge badge-green">
+              ✅ Inscrit
+            </span>
+
+            <!-- ✅ Badge position attente -->
+            <span *ngIf="m.estEnAttente"
+                  class="badge badge-amber">
+              {{ getPositionLabel(m.positionAttente||1) }}
+            </span>
+
+            <button class="btn btn-info btn-sm"
+                    (click)="ouvrirDetail(m)">
+              🔍 Détails
+            </button>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── MES MATCHS ─── -->
+    <div *ngIf="onglet === 'mes-matchs'">
+
+      <div *ngIf="mesMatchs.length === 0"
+           class="empty-state">
+        <div class="empty-icon">👤</div>
+        <h3>Vous n'avez aucun match</h3>
+        <p>Créez ou rejoignez un match !</p>
+      </div>
+
+      <div class="matchs-grid"
+           *ngIf="mesMatchs.length > 0">
+        <div class="match-card anim-fade-up"
+             *ngFor="let m of mesMatchs">
+
+          <!-- ✅ Bannière attente -->
+          <div class="attente-banner"
+               *ngIf="m.estEnAttente">
+            <span>⏳</span>
+            <span>
+              {{ getPositionLabel(m.positionAttente||1) }}
+              — En attente d'une place
+            </span>
+          </div>
+
+          <div class="mc-header">
+            <div class="mc-sport-icon">
+              {{ getSportIcon(m.sport) }}
+            </div>
+            <div class="mc-header-info">
+              <div class="mc-titre">{{ m.titre }}</div>
+              <div class="mc-format">{{ m.format }}</div>
+            </div>
+            <span class="badge"
+                  [ngClass]="getStatutBadge(m.statut||'')">
+              {{ m.statut }}
+            </span>
+          </div>
+
+          <div class="mc-infos">
+            <div class="mc-info-item">
+              <span class="mci-icon">📅</span>
+              <span>{{ m.date }}</span>
+            </div>
+            <div class="mc-info-item">
+              <span class="mci-icon">🕐</span>
+              <span>{{ m.heure }}</span>
+            </div>
+          </div>
+
+          <div class="mc-joueurs-section">
+            <div class="mc-joueurs-header">
+              <span class="mc-joueurs-label">
+                👥 Joueurs
+              </span>
+              <span class="mc-joueurs-count">
+                <strong style="color:var(--green)">
+                  {{ m.nbJoueursActuel }}
+                </strong>
+                /{{ m.nbJoueursMax }}
+              </span>
+            </div>
+            <div class="mc-progress">
+              <div class="mc-progress-fill"
+                   [style.width]="getPct(m) + '%'"
+                   [style.background]="
+                     m.placesRestantes === 0
+                     ? 'var(--red)' : 'var(--green)'">
+              </div>
+            </div>
+          </div>
+
+          <div class="mc-actions">
+            <span *ngIf="m.estCreateur"
+                  class="badge badge-purple">
+              👑 Votre match
+            </span>
+            <span *ngIf="m.estInscrit && !m.estCreateur"
+                  class="badge badge-blue">
+              👤 Inscrit
+            </span>
+            <span *ngIf="m.estEnAttente"
+                  class="badge badge-amber">
+              {{ getPositionLabel(m.positionAttente||1) }}
+            </span>
+            <button *ngIf="m.estCreateur
+                        && m.statut !== 'ANNULE'"
+                    class="btn btn-danger btn-sm"
+                    (click)="annuler(m.id!)">
+              🚫 Annuler
+            </button>
+            <button *ngIf="m.estInscrit
+                        && !m.estCreateur"
+                    class="btn btn-secondary btn-sm"
+                    (click)="quitter(m.id!)">
+              🚪 Quitter
+            </button>
+            <button *ngIf="m.estEnAttente"
+                    class="btn btn-ghost btn-sm"
+                    (click)="quitterAttente(m.id!)">
+              ✕ Quitter l'attente
+            </button>
+            <button class="btn btn-info btn-sm"
+                    (click)="ouvrirDetail(m)">
+              🔍 Voir joueurs
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- MODAL DÉTAIL + LISTE D'ATTENTE             -->
+<!-- ════════════════════════════════════════════ -->
+<div class="modal-backdrop"
+     *ngIf="modalOuvert && matchSelectionne"
+     (click)="onBackdropClick($event)">
+
+  <div class="modal-detail">
+
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <div class="modal-sport-icon">
+          {{ getSportIcon(matchSelectionne.sport) }}
+        </div>
+        <div>
+          <div class="modal-titre">
+            {{ matchSelectionne.titre }}
+          </div>
+          <div class="modal-sous-titre">
+            {{ matchSelectionne.format }} ·
+            {{ matchSelectionne.sport }}
+          </div>
+        </div>
+      </div>
+      <button class="modal-close"
+              (click)="fermerModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- STATS -->
+      <div class="modal-stats">
+        <div class="ms-item">
+          <div class="ms-value green">
+            {{ matchSelectionne.nbJoueursActuel }}
+          </div>
+          <div class="ms-label">Inscrits</div>
+        </div>
+        <div class="ms-sep"></div>
+        <div class="ms-item">
+          <div class="ms-value"
+               [style.color]="
+                 matchSelectionne.placesRestantes===0
+                 ? 'var(--red)' : 'var(--amber)'">
+            {{ matchSelectionne.placesRestantes }}
+          </div>
+          <div class="ms-label">Places libres</div>
+        </div>
+        <div class="ms-sep"></div>
+        <!-- ✅ Stat liste d'attente -->
+        <div class="ms-item">
+          <div class="ms-value"
+               [style.color]="
+                 (matchSelectionne.nbAttente||0) > 0
+                 ? 'var(--amber)' : 'var(--muted)'">
+            {{ matchSelectionne.nbAttente || 0 }}
+          </div>
+          <div class="ms-label">En attente</div>
+        </div>
+        <div class="ms-sep"></div>
+        <div class="ms-item">
+          <div class="ms-value purple">
+            {{ matchSelectionne.nbJoueursMax }}
+          </div>
+          <div class="ms-label">Max joueurs</div>
+        </div>
+      </div>
+
+      <!-- BARRE -->
+      <div class="modal-progress-section">
+        <div class="modal-progress-header">
+          <span style="font-size:0.82rem;
+                       color:var(--muted)">
+            Remplissage
+          </span>
+          <span style="font-size:0.82rem;
+                       font-weight:700;
+                       color:var(--green)">
+            {{ getPct(matchSelectionne) }}%
+          </span>
+        </div>
+        <div class="mc-progress" style="height:10px">
+          <div class="mc-progress-fill"
+               [style.width]="
+                 getPct(matchSelectionne) + '%'"
+               [style.background]="
+                 matchSelectionne.placesRestantes===0
+                 ? 'var(--red)' : 'var(--green)'">
+          </div>
+        </div>
+      </div>
+
+      <!-- INFOS -->
+      <div class="modal-infos-grid">
+        <div class="mig-item">
+          <span class="mig-icon">📅</span>
+          <div>
+            <div class="mig-label">Date</div>
+            <div class="mig-val">
+              {{ matchSelectionne.date }}
+            </div>
+          </div>
+        </div>
+        <div class="mig-item">
+          <span class="mig-icon">🕐</span>
+          <div>
+            <div class="mig-label">Heure</div>
+            <div class="mig-val">
+              {{ matchSelectionne.heure }}
+            </div>
+          </div>
+        </div>
+        <div class="mig-item"
+             *ngIf="matchSelectionne.terrainNom">
+          <span class="mig-icon">🏟️</span>
+          <div>
+            <div class="mig-label">Terrain</div>
+            <div class="mig-val">
+              {{ matchSelectionne.terrainNom }}
+            </div>
+          </div>
+        </div>
+        <div class="mig-item">
+          <span class="mig-icon">📊</span>
+          <div>
+            <div class="mig-label">Niveau</div>
+            <div class="mig-val">
+              <span class="badge"
+                    [ngClass]="getNiveauBadge(
+                      matchSelectionne.niveau)">
+                {{ matchSelectionne.niveau }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div *ngIf="matchSelectionne.description"
+           class="modal-description">
+        <div class="modal-section-title">
+          📝 Description
+        </div>
+        <p>{{ matchSelectionne.description }}</p>
+      </div>
+
+      <!-- ✅ JOUEURS CONFIRMÉS -->
+      <div class="modal-joueurs-section">
+        <div class="modal-section-title">
+          ✅ Joueurs confirmés
+          <span class="badge badge-green"
+                style="margin-left:8px">
+            {{ matchSelectionne.nbJoueursActuel }}
+            / {{ matchSelectionne.nbJoueursMax }}
+          </span>
+        </div>
+
+        <div class="joueurs-liste">
+          <div class="joueur-item"
+               *ngFor="let email of
+                 matchSelectionne.joueurs;
+                 let i = index">
+            <div class="joueur-num">{{ i + 1 }}</div>
+            <div class="joueur-avatar"
+                 [class.createur-avatar]="
+                   email === matchSelectionne.createurId">
+              {{ getInitialesEmail(email) }}
+            </div>
+            <div class="joueur-info">
+              <div class="joueur-nom">
+                {{ getNomDepuisEmail(email) }}
+              </div>
+              <div class="joueur-email">{{ email }}</div>
+            </div>
+            <span class="badge"
+                  [ngClass]="getRoleBadge(
+                    email, matchSelectionne)">
+              {{ getRoleJoueur(
+                   email, matchSelectionne) }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ LISTE D'ATTENTE -->
+      <div class="modal-attente-section"
+           *ngIf="(matchSelectionne.listeAttente
+                   ?.length || 0) > 0">
+
+        <div class="modal-section-title attente-title">
+          ⏳ Liste d'attente
+          <span class="badge badge-amber"
+                style="margin-left:8px">
+            {{ matchSelectionne.listeAttente?.length }}
+            personne(s)
+          </span>
+        </div>
+
+        <!-- Explication -->
+        <div class="attente-explication">
+          <span>ℹ️</span>
+          <span>
+            Si un joueur se désiste, le premier
+            de cette liste rejoint automatiquement
+            le match.
+          </span>
+        </div>
+
+        <div class="joueurs-liste">
+          <div class="joueur-item attente-item"
+               *ngFor="let email of
+                 matchSelectionne.listeAttente;
+                 let i = index">
+
+            <div class="joueur-num attente-num">
+              {{ i + 1 }}
+            </div>
+
+            <div class="joueur-avatar attente-avatar">
+              {{ getInitialesEmail(email) }}
+            </div>
+
+            <div class="joueur-info">
+              <div class="joueur-nom">
+                {{ getNomDepuisEmail(email) }}
+              </div>
+              <div class="joueur-email">{{ email }}</div>
+            </div>
+
+            <div class="attente-position">
+              <span class="badge badge-amber"
+                    *ngIf="i === 0">
+                🥇 Prochain
+              </span>
+              <span class="badge badge-blue"
+                    *ngIf="i > 0">
+                #{{ i + 1 }}
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Places libres -->
+      <div class="places-libres"
+           *ngIf="matchSelectionne.placesRestantes > 0">
+        <div class="modal-section-title"
+             style="margin-bottom:8px">
+          🟢 Places disponibles
+          ({{ matchSelectionne.placesRestantes }})
+        </div>
+        <div class="places-grid">
+          <div class="place-libre-item"
+               *ngFor="let p of getPlacesAffichees(
+                 matchSelectionne)">
+            <div class="pli-avatar">+</div>
+            <div class="pli-label">Place libre</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- FOOTER MODAL -->
+    <div class="modal-footer">
+      <button class="btn btn-secondary"
+              (click)="fermerModal()">
+        Fermer
+      </button>
+
+      <!-- Rejoindre (place dispo) -->
+      <button *ngIf="!matchSelectionne.estInscrit
+                  && !matchSelectionne.estCreateur
+                  && !matchSelectionne.estEnAttente
+                  && matchSelectionne.statut==='OUVERT'"
+              class="btn btn-primary"
+              (click)="rejoindre(matchSelectionne.id!);
+                       fermerModal()">
+        ➕ Rejoindre
+      </button>
+
+      <!-- ✅ Rejoindre liste attente (match complet) -->
+      <button *ngIf="!matchSelectionne.estInscrit
+                  && !matchSelectionne.estCreateur
+                  && !matchSelectionne.estEnAttente
+                  && matchSelectionne.statut==='COMPLET'"
+              class="btn btn-attente"
+              (click)="rejoindre(matchSelectionne.id!);
+                       fermerModal()">
+        ⏳ Rejoindre la liste d'attente
+      </button>
+
+      <!-- Quitter liste attente -->
+      <button *ngIf="matchSelectionne.estEnAttente"
+              class="btn btn-ghost btn-sm"
+              (click)="quitterAttente(
+                matchSelectionne.id!)">
+        ✕ Quitter l'attente
+      </button>
+
+      <!-- Quitter match -->
+      <button *ngIf="matchSelectionne.estInscrit
+                  && !matchSelectionne.estCreateur"
+              class="btn btn-secondary"
+              (click)="quitter(matchSelectionne.id!)">
+        🚪 Quitter le match
+      </button>
+
+      <!-- Annuler match (créateur) -->
+      <button *ngIf="matchSelectionne.estCreateur
+                  && matchSelectionne.statut!=='ANNULE'"
+              class="btn btn-danger btn-sm"
+              (click)="annuler(matchSelectionne.id!)">
+        🚫 Annuler le match
+      </button>
+    </div>
+
+  </div>
+</div>

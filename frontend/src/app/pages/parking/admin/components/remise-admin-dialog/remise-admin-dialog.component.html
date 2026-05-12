@@ -1,0 +1,136 @@
+<div class="sp-card" style="margin: 0; border: none; border-radius: 0; background: var(--bg); max-height: 90vh; overflow-y: auto;">
+  <div class="section-header">
+    <h2 class="section-title">
+      <div class="logo-icon" style="width: 28px; height: 28px; font-size: 14px; margin-right: 10px;">
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: white;">payments</mat-icon>
+      </div>
+      Tarifs Dynamiques - <span style="color: var(--green); margin-left: 5px;">{{ parking.nom }}</span>
+    </h2>
+    <button class="btn btn-ghost" style="padding: 5px;" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="sp-card" style="margin-bottom: 20px; background: var(--card2);">
+    <h3 class="section-title" style="color: var(--purple); margin-bottom: 15px;">
+      <mat-icon style="margin-right: 8px;">schedule</mat-icon>
+      Configuration de Tarification Globale
+    </h3>
+
+    <form [formGroup]="parkingForm" (ngSubmit)="saveParkingTarifs()" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
+      <div class="sp-field" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+        <label class="form-label">Majoration Dépassement (TND/H)</label>
+        <input type="number" class="form-input" formControlName="tarifDepassement" step="0.5">
+      </div>
+
+      <div class="sp-field" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+        <label class="form-label">Remise Arrivée Tardive (TND/H)</label>
+        <input type="number" class="form-input" formControlName="remiseRetard" step="0.5">
+      </div>
+
+      <div style="flex-basis: 100%; display: flex; justify-content: flex-end; margin-top: 10px;">
+        <button class="btn" style="background: var(--purple); color: white; border-color: var(--purple);" type="submit" [disabled]="parkingForm.invalid">
+          <mat-icon style="font-size: 18px; width: 18px; height: 18px; margin-right: 4px;">save</mat-icon> Mettre à jour les tarifs
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="sp-card" style="background: var(--card2);">
+    <h3 class="section-title" style="color: var(--blue); margin-bottom: 15px;">
+      <mat-icon style="margin-right: 8px;">{{ editingId ? 'edit' : 'add_circle' }}</mat-icon>
+      {{ editingId ? 'Modifier la règle de remise' : 'Ajouter une nouvelle promotion' }}
+    </h3>
+
+    <form [formGroup]="remiseForm" (ngSubmit)="saveRemise()" class="remise-form" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
+
+      <div class="sp-field" style="width: 150px; margin-bottom: 0;">
+        <label class="form-label">Dès (Heures)</label>
+        <input type="number" class="form-input" formControlName="seuilHeures" [class.invalid]="remiseForm.get('seuilHeures')?.invalid && remiseForm.get('seuilHeures')?.touched">
+        <small class="error-text" *ngIf="remiseForm.get('seuilHeures')?.errors?.['required'] && remiseForm.get('seuilHeures')?.touched">Obligatoire</small>
+        <small class="error-text" *ngIf="remiseForm.get('seuilHeures')?.errors?.['min'] && remiseForm.get('seuilHeures')?.touched">Min 1h</small>
+      </div>
+
+      <div class="sp-field" style="width: 150px; margin-bottom: 0;">
+        <label class="form-label">Remise (%)</label>
+        <input type="number" class="form-input" formControlName="pourcentageRemise" [class.invalid]="remiseForm.get('pourcentageRemise')?.invalid && remiseForm.get('pourcentageRemise')?.touched">
+        <small class="error-text" *ngIf="remiseForm.get('pourcentageRemise')?.errors?.['required'] && remiseForm.get('pourcentageRemise')?.touched">Obligatoire</small>
+        <small class="error-text" *ngIf="remiseForm.get('pourcentageRemise')?.errors?.['max'] && remiseForm.get('pourcentageRemise')?.touched">Max 100%</small>
+      </div>
+
+      <div class="sp-field" style="flex-grow: 1; min-width: 250px; margin-bottom: 0;">
+        <label class="form-label">Libellé de l'offre</label>
+        <input type="text" class="form-input" formControlName="description" placeholder="Ex: Tarif Long Séjour">
+      </div>
+
+      <div class="sp-field" style="width: 200px; margin-bottom: 0;">
+        <label class="form-label">Style Visuel</label>
+        <select class="form-input" formControlName="themeVisuel">
+          <option value="theme-demi">☀️ Jour (Orange)</option>
+          <option value="theme-nuit">🌙 Nuit (Bleu)</option>
+          <option value="theme-standard">⚪ Classique (Gris)</option>
+        </select>
+      </div>
+
+      <div style="flex-basis: 100%; display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+        <button *ngIf="editingId" class="btn btn-secondary" type="button" (click)="resetForm()">
+          Annuler l'édition
+        </button>
+        <button class="btn btn-primary" type="submit" [disabled]="remiseForm.invalid">
+          <mat-icon style="font-size: 18px; width: 18px; height: 18px; margin-right: 4px;">{{ editingId ? 'check' : 'add' }}</mat-icon>
+          {{ editingId ? 'Valider les modifications' : 'Créer la règle' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div style="margin-top: 25px;">
+    <h3 class="section-title">
+      <mat-icon style="margin-right: 8px;">list</mat-icon> Liste des remises configurées
+    </h3>
+
+    <div *ngIf="remises.length === 0" class="empty-state">
+      <mat-icon class="empty-icon">money_off</mat-icon>
+      <p>Aucune remise n'est encore définie pour ce parking.</p>
+    </div>
+
+    <table class="sp-table" *ngIf="remises.length > 0">
+      <thead>
+        <tr>
+          <th>Seuil</th>
+          <th>Réduction</th>
+          <th>Description</th>
+          <th>Thème</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let element of remises" [style.background]="element.id === editingId ? 'rgba(59, 158, 255, 0.1)' : ''">
+          <td><b>{{ element.seuilHeures }} h</b></td>
+          <td>
+            <span class="badge badge-green">-{{ element.pourcentageRemise }}%</span>
+          </td>
+          <td>{{ element.description }}</td>
+          <td>
+            <span class="badge" [ngClass]="{
+              'badge-amber': element.themeVisuel === 'theme-demi',
+              'badge-blue': element.themeVisuel === 'theme-nuit',
+              'badge-secondary': element.themeVisuel === 'theme-standard'
+            }">
+              {{ element.themeVisuel === 'theme-demi' ? '☀️ Jour' :
+              element.themeVisuel === 'theme-nuit' ? '🌙 Nuit' : '⚪ Basique' }}
+            </span>
+          </td>
+          <td style="text-align: right;">
+            <button class="btn btn-ghost" style="padding: 6px;" (click)="editRemise(element)">
+              <mat-icon style="font-size: 18px; width: 18px; height: 18px;">edit</mat-icon>
+            </button>
+            <button class="btn btn-danger" style="padding: 6px; margin-left: 5px;" (click)="deleteRemise(element.id!)">
+              <mat-icon style="font-size: 18px; width: 18px; height: 18px;">delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

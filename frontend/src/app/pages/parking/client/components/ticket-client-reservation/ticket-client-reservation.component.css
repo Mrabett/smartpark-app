@@ -1,0 +1,289 @@
+.ticket-container {
+  min-height: 100vh;
+  background-color: #f4f7f6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.ticket-card {
+  width: 100%;
+  max-width: 380px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.ticket-header {
+  background-color: #2e7d32;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.ticket-header mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 10px;
+}
+
+.ticket-header h1 {
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.ticket-body {
+  padding: 25px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.info-row span {
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.dashed-line {
+  border: none;
+  border-top: 2px dashed #eee;
+  margin: 20px 0;
+}
+
+.time-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+}
+
+.time-block label {
+  font-size: 0.8rem;
+  color: #999;
+  text-transform: uppercase;
+}
+
+.time-block p {
+  margin: 5px 0 2px 0;
+  font-weight: bold;
+}
+
+.time-block span {
+  font-size: 1.2rem;
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+.price-box {
+  margin-top: 25px;
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.price-box span {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.price-box h2 {
+  margin: 5px 0 0 0;
+  color: #333;
+}
+
+.ticket-actions {
+  padding: 20px;
+  background: #fafafa;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.status-box {
+  text-align: center;
+}
+
+/* ══════════════════════════════════════════
+   SECTION EMPLOYÉ — Calcul tarifaire
+══════════════════════════════════════════ */
+.employee-pricing-section {
+  margin: 0 16px 20px;
+  border: 2px dashed #cfd8dc;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f8f9fa;
+}
+
+.emp-section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #263238;
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.emp-section-title mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.emp-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  color: #607d8b;
+  font-size: 0.9rem;
+}
+
+/* Badge statut */
+.emp-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.emp-status-badge mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.badge-ok {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badge-retard {
+  background: #fff3e0;
+  color: #e65100;
+}
+
+.badge-remise {
+  background: #e3f2fd;
+  color: #0277bd;
+}
+
+/* Décomposition prix */
+.price-detail {
+  padding: 8px 16px 4px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.price-detail-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 0.85rem;
+  color: #546e7a;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.price-detail-line.surcharge {
+  color: #c62828;
+  font-weight: 500;
+}
+
+.price-detail-line.discount {
+  color: #1565c0;
+  font-weight: 500;
+}
+
+/* Total employé */
+.emp-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+}
+
+.emp-total-ok {
+  background: #e8f5e9;
+}
+
+.emp-total-red {
+  background: #fff3e0;
+}
+
+.emp-total-blue {
+  background: #e3f2fd;
+}
+
+.emp-total-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #607d8b;
+  font-weight: 700;
+}
+
+.emp-total-amount {
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.emp-total-ok .emp-total-amount {
+  color: #1b5e20;
+}
+
+.emp-total-red .emp-total-amount {
+  color: #bf360c;
+}
+
+.emp-total-blue .emp-total-amount {
+  color: #01579b;
+}
+
+.remise-tag {
+  color: #2e7d32;
+  background: #e8f5e9;
+  padding: 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+}
+
+.majoration-tag {
+  color: #c62828;
+  background: #ffebee;
+  padding: 8px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+}
+
+.total-section {
+  text-align: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.text-success {
+  color: #2e7d32;
+}
+
+.text-danger {
+  color: #c62828;
+}

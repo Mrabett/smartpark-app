@@ -1,0 +1,67 @@
+<nav class="sp-navbar" *ngIf="isLoggedIn()">
+
+  <a routerLink="/" class="logo">
+    <div class="logo-icon">⚽</div>
+    SmartPark
+  </a>
+
+  <!-- LIENS ADMIN -->
+  <div class="nav-links" *ngIf="isAdmin()">
+    <a routerLink="/dashboard"    routerLinkActive="active">🏠 Dashboard</a>
+    <a routerLink="/terrains"     routerLinkActive="active">🏟️ Terrains</a>
+    <a routerLink="/reservations" routerLinkActive="active">📅 Réservations</a>
+    <a routerLink="/marketplace/admin" routerLinkActive="active">🛒 Marketplace</a>
+    <a routerLink="/parking/admin" routerLinkActive="active">🅿️ Parking</a>
+
+
+
+  </div>
+
+  <!-- LIENS USER -->
+  <div class="nav-links" *ngIf="isUser()">
+    <a routerLink="/user/terrains"     routerLinkActive="active">🏟️ Terrains</a>
+    <a routerLink="/user/calendrier"   routerLinkActive="active">📆 Calendrier</a>
+    <a routerLink="/user/reservations" routerLinkActive="active">📅 Mes Réservations</a>
+    <a routerLink="/chatbot"           routerLinkActive="active">🤖 Assistant IA</a>
+    <a routerLink="/user/matchs" routerLinkActive="active">
+  ⚽ Matchs
+</a>
+    <a routerLink="/user/fidelite" routerLinkActive="active">
+  🎖️ Fidélité
+</a>
+    <a routerLink="/marketplace/client" routerLinkActive="active">🛒 Boutique</a>
+    <a routerLink="/parking/client" routerLinkActive="active">🅿️ Parking</a>
+
+  </div>
+
+  <!-- DROITE -->
+  <div class="nav-right">
+    <div class="user-chip"
+         [routerLink]="isUser() ? '/user/parametres' : null"
+         [style.cursor]="isUser() ? 'pointer' : 'default'"
+         title="Paramètres du compte">
+      <div class="user-avatar">{{ getUserInitial() }}</div>
+      <span>{{ getUserNom() }}</span>
+      <span class="role-badge"
+            [class.admin]="isAdmin()"
+            [class.user]="isUser()">
+        {{ isAdmin() ? '👑 Admin' : '👤 Client' }}
+      </span>
+    </div>
+
+    <!-- Bouton ⚙️ uniquement pour le USER -->
+    <a routerLink="/user/parametres"
+       class="btn-settings"
+       *ngIf="isUser()"
+       title="Paramètres">
+      ⚙️
+    </a>
+
+    <button class="btn-logout" (click)="logout()" title="Déconnexion">
+      🚪
+    </button>
+  </div>
+
+</nav>
+
+<router-outlet></router-outlet>

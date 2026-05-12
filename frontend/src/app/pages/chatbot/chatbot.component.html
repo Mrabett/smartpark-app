@@ -1,0 +1,189 @@
+<!-- chatbot.component.html -->
+<div class="chat-root">
+
+  <!-- SIDEBAR -->
+  <aside class="chat-sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-orb">🤖</div>
+      <div class="brand-text">
+        <span class="brand-name">SmartPark</span>
+        <span class="brand-sub">Assistant IA</span>
+      </div>
+    </div>
+
+    <button class="new-chat-btn" (click)="clearChat()">
+      <span class="plus-icon">＋</span>
+      Nouvelle conversation
+    </button>
+
+    <div class="sidebar-section-label">Suggestions rapides</div>
+    <div class="sidebar-chips">
+      <button *ngFor="let s of suggestions"
+              class="sidebar-chip"
+              (click)="sendMessage(s)"
+              [disabled]="isLoading">
+        <span class="chip-icon">💬</span>
+        <span class="chip-text">{{ s }}</span>
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="model-badge">
+        <span class="model-dot"></span>
+        Claude AI · En ligne
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CHAT -->
+  <main class="chat-main">
+
+    <!-- TOP BAR -->
+    <div class="chat-topbar">
+      <div class="topbar-left">
+        <div class="topbar-avatar">🤖</div>
+        <div>
+          <div class="topbar-title">Assistant SmartPark</div>
+          <div class="topbar-status">
+            <span class="status-pulse"></span>
+            Propulsé par Claude AI · Données temps réel
+          </div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-btn" (click)="clearChat()" title="Nouvelle conversation">
+          🔄
+        </button>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="messages-scroll" #messagesContainer>
+
+      <!-- Écran d'accueil si premier message -->
+      <div class="welcome-screen" *ngIf="messages.length <= 1">
+        <div class="welcome-orb">
+          <div class="orb-inner">🤖</div>
+          <div class="orb-ring"></div>
+        </div>
+        <h2 class="welcome-title">
+          Comment puis-je<br>vous aider ?
+        </h2>
+        <p class="welcome-sub">
+          Posez-moi n'importe quelle question sur SmartPark
+        </p>
+        <div class="welcome-cards">
+          <button class="welcome-card"
+                  (click)="sendMessage('Quels terrains sont disponibles ?')">
+            <span class="wc-icon">🏟️</span>
+            <span class="wc-text">Terrains disponibles</span>
+          </button>
+          <button class="welcome-card"
+                  (click)="sendMessage('Quel est le tarif pour ce soir ?')">
+            <span class="wc-icon">💰</span>
+            <span class="wc-text">Tarifs du soir</span>
+          </button>
+          <button class="welcome-card"
+                  (click)="sendMessage('Je veux réserver un terrain de foot')">
+            <span class="wc-icon">⚽</span>
+            <span class="wc-text">Réserver un terrain</span>
+          </button>
+          <button class="welcome-card"
+                  (click)="sendMessage('Quelles sont les heures les moins chères ?')">
+            <span class="wc-icon">🎁</span>
+            <span class="wc-text">Heures économiques</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="messages-list" *ngIf="messages.length > 1">
+        <div *ngFor="let msg of messages; let i = index"
+             class="msg-row"
+             [class.msg-row-user]="msg.role === 'user'"
+             [class.msg-row-ai]="msg.role === 'assistant'">
+
+          <!-- IA Message -->
+          <ng-container *ngIf="msg.role === 'assistant'">
+            <div class="ai-avatar-sm">🤖</div>
+            <div class="ai-message-wrap">
+              <div class="ai-bubble">
+                <!-- Loading -->
+                <div *ngIf="msg.isLoading" class="typing-indicator">
+                  <span></span><span></span><span></span>
+                </div>
+                <!-- Texte -->
+                <div *ngIf="!msg.isLoading" class="bubble-text">
+                  {{ msg.content }}
+                </div>
+                <!-- Action -->
+                <button *ngIf="!msg.isLoading && msg.intent?.action"
+                        (click)="navigateTo(msg.intent.action)"
+                        class="action-pill">
+                  {{ msg.intent.label }}
+                  <span class="pill-arrow">→</span>
+                </button>
+              </div>
+              <div class="msg-meta" *ngIf="!msg.isLoading">
+                {{ formatTime(msg.timestamp) }}
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- User Message -->
+          <ng-container *ngIf="msg.role === 'user'">
+            <div class="user-message-wrap">
+              <div class="user-bubble">{{ msg.content }}</div>
+              <div class="msg-meta user-meta">
+                {{ formatTime(msg.timestamp) }}
+              </div>
+            </div>
+            <div class="user-avatar-sm">👤</div>
+          </ng-container>
+
+        </div>
+      </div>
+
+      <!-- Padding bas -->
+      <div style="height:20px"></div>
+    </div>
+
+    <!-- INPUT ZONE -->
+    <div class="input-zone">
+      <div class="input-container">
+        <div class="input-box" [class.input-focused]="isFocused">
+          <textarea
+            #inputRef
+            [(ngModel)]="inputMessage"
+            (keydown)="onKeyPress($event)"
+            (focus)="isFocused = true"
+            (blur)="isFocused = false"
+            placeholder="Posez votre question à l'assistant SmartPark..."
+            rows="1"
+            [disabled]="isLoading"
+            class="chat-textarea">
+          </textarea>
+          <button class="send-button"
+                  (click)="sendMessage()"
+                  [disabled]="!inputMessage.trim() || isLoading"
+                  [class.send-active]="inputMessage.trim() && !isLoading">
+            <svg *ngIf="!isLoading" viewBox="0 0 24 24" fill="none"
+                 xmlns="http://www.w3.org/2000/svg" width="18" height="18">
+              <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"
+                    stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span *ngIf="isLoading" class="spinner"></span>
+          </button>
+        </div>
+        <div class="input-hint-row">
+          <span>Entrée pour envoyer · Shift+Entrée pour nouvelle ligne</span>
+          <span *ngIf="isLoading" class="thinking-text">
+            ✨ L'IA réfléchit...
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>

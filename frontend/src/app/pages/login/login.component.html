@@ -1,0 +1,211 @@
+<!-- login.component.html -->
+<div class="login-root">
+
+  <!-- ══ SCÈNE ARRIÈRE-PLAN ══ -->
+  <div class="bg-scene">
+    <div class="sky"></div>
+
+    <!-- Lune -->
+    <div class="moon">
+      <div class="moon-glow"></div>
+      <div class="moon-core"></div>
+      <div class="moon-halo"></div>
+    </div>
+
+    <!-- Étoiles -->
+    <div class="stars-layer">
+      <div class="star" *ngFor="let s of stars"
+           [style.left]="s.x+'%'" [style.top]="s.y+'%'"
+           [style.width]="s.size+'px'" [style.height]="s.size+'px'"
+           [style.animation-delay]="s.delay+'s'"
+           [style.animation-duration]="s.dur+'s'">
+      </div>
+    </div>
+
+    <!-- Montagnes SVG -->
+    <svg class="mtn back" viewBox="0 0 1440 500"
+         preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="mtnBg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0e2233"/>
+          <stop offset="100%" stop-color="#0a1a28"/>
+        </linearGradient>
+      </defs>
+      <path d="M0,500 L0,260 L100,160 L200,220 L320,90
+               L440,170 L560,60 L680,150 L800,50
+               L920,130 L1040,70 L1160,150 L1280,80
+               L1440,160 L1440,500 Z" fill="url(#mtnBg)"/>
+    </svg>
+
+    <svg class="mtn mid" viewBox="0 0 1440 500"
+         preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="mtnMid" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#132b3e"/>
+          <stop offset="100%" stop-color="#0c1e2d"/>
+        </linearGradient>
+      </defs>
+      <path d="M0,500 L0,320 L140,210 L260,290 L380,180
+               L500,260 L620,150 L740,230 L860,160
+               L980,240 L1100,170 L1220,250 L1360,185
+               L1440,230 L1440,500 Z" fill="url(#mtnMid)"/>
+    </svg>
+
+    <svg class="mtn front" viewBox="0 0 1440 500"
+         preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="mtnFront" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#0c2030"/>
+          <stop offset="100%" stop-color="#08151f"/>
+        </linearGradient>
+      </defs>
+      <path d="M0,500 L0,370 L100,280 L200,340 L300,260
+               L420,330 L540,240 L660,310 L780,255
+               L900,320 L1020,265 L1140,330 L1260,270
+               L1380,320 L1440,290 L1440,500 Z" fill="url(#mtnFront)"/>
+    </svg>
+
+    <!-- Arbres gauche -->
+    <div class="forest left">
+      <div class="pine pine-lg"><span></span><span></span><span></span><b></b></div>
+      <div class="pine pine-md"><span></span><span></span><span></span><b></b></div>
+      <div class="pine pine-sm"><span></span><span></span><b></b></div>
+      <div class="pine pine-lg" style="margin-left:-20px"><span></span><span></span><span></span><b></b></div>
+      <div class="pine pine-md" style="margin-left:10px"><span></span><span></span><b></b></div>
+    </div>
+
+    <!-- Arbres droite -->
+    <div class="forest right">
+      <div class="pine pine-md"><span></span><span></span><b></b></div>
+      <div class="pine pine-lg"><span></span><span></span><span></span><b></b></div>
+      <div class="pine pine-sm"><span></span><span></span><b></b></div>
+      <div class="pine pine-lg" style="margin-left:-15px"><span></span><span></span><span></span><b></b></div>
+    </div>
+
+    <!-- Lac -->
+    <div class="lake-wrap">
+      <div class="lake">
+        <!-- Reflet de la lune -->
+        <div class="moon-reflect"></div>
+        <!-- Ondulations -->
+        <div class="ripple rp1"></div>
+        <div class="ripple rp2"></div>
+        <div class="ripple rp3"></div>
+      </div>
+    </div>
+
+    <!-- Brume -->
+    <div class="fog fog1"></div>
+    <div class="fog fog2"></div>
+
+    <!-- Sol -->
+    <div class="ground-strip"></div>
+  </div>
+
+  <!-- ══ CARD LOGIN ══ -->
+  <div class="glass-card">
+
+    <!-- Logo -->
+    <div class="gl-logo">
+      <div class="gl-icon-ring">
+        <div class="gl-icon-pulse"></div>
+        <div class="gl-icon">⚽</div>
+      </div>
+      <div class="gl-brand">Smart<span>Park</span></div>
+    </div>
+
+    <h1 class="gl-title">Connexion</h1>
+
+    <!-- Erreur -->
+    <div *ngIf="erreur" class="gl-error">
+      <span>⚠️</span> {{ erreur }}
+    </div>
+
+    <!-- Form -->
+    <form (ngSubmit)="login()" class="gl-form">
+
+      <!-- Email field -->
+      <div class="gl-field" [class.focused]="focusEmail || email.length > 0">
+        <div class="gf-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+        <input type="email" [(ngModel)]="email" name="email"
+               placeholder="Email"
+               (focus)="focusEmail=true" (blur)="focusEmail=false"
+               required>
+        <div class="gf-bar"></div>
+      </div>
+
+      <!-- Password field -->
+      <div class="gl-field" [class.focused]="focusPwd || password.length > 0">
+        <div class="gf-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <input [type]="showPwd ? 'text':'password'"
+               [(ngModel)]="password" name="password"
+               placeholder="Mot de passe"
+               (focus)="focusPwd=true" (blur)="focusPwd=false"
+               required>
+        <button type="button" class="gf-eye"
+                (click)="showPwd=!showPwd">
+          <svg *ngIf="!showPwd" width="15" height="15" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <svg *ngIf="showPwd" width="15" height="15" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17.94 17.94A10 10 0 0 1 12 20c-7 0-11-8-11-8a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9 9 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+        </button>
+        <div class="gf-bar"></div>
+      </div>
+
+      <!-- Options row -->
+      <div class="gl-opts">
+        <label class="rem-me">
+          <input type="checkbox" [(ngModel)]="remember" name="rem">
+          <span class="rem-box"></span>
+          <span>Se souvenir</span>
+        </label>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="gl-submit" [disabled]="loading">
+        <div class="gs-glow"></div>
+        <span *ngIf="!loading" class="gs-text">
+          Se connecter
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.5"
+               class="gs-arrow">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+        <span *ngIf="loading" class="gs-dots">
+          <i></i><i></i><i></i>
+        </span>
+        <div class="gs-shine"></div>
+      </button>
+
+      <!-- Register -->
+      <p class="gl-register">
+        Pas de compte ?
+        <a routerLink="/register" class="gl-reg-link">S'inscrire</a>
+      </p>
+
+    </form>
+
+
+  </div>
+
+</div>

@@ -1,0 +1,191 @@
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.5s ease both;
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+    span { color: var(--green); }
+  }
+
+  p { color: var(--muted); font-size: 0.875rem; }
+}
+
+.alert-msg {
+  background: rgba(0,201,127,0.1);
+  border: 1px solid rgba(0,201,127,0.3);
+  color: var(--green);
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.filtres {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  animation: fadeUp 0.5s 0.1s ease both;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.tab {
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--card2);
+  color: var(--muted);
+  transition: all 0.2s;
+  font-family: 'Inter', sans-serif;
+
+  &:hover, &.active {
+    background: var(--green-glow);
+    border-color: var(--border2);
+    color: var(--green);
+  }
+}
+
+.terrains-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  animation: fadeUp 0.5s 0.2s ease both;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.terrain-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  transition: all 0.3s;
+  animation: fadeUp 0.5s ease both;
+  opacity: 0;
+  animation-fill-mode: forwards;
+
+  &:hover {
+    border-color: rgba(0,201,127,0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.3);
+  }
+}
+
+.terrain-img {
+  height: 110px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.bg-foot   { background: linear-gradient(135deg, #0d4d2a, #1a7a44); }
+  &.bg-padel  { background: linear-gradient(135deg, #0d2d4d, #1a4a7a); }
+  &.bg-tennis { background: linear-gradient(135deg, #4d3d0d, #7a621a); }
+  &.bg-basket { background: linear-gradient(135deg, #4d1a0d, #7a2e1a); }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 40%, var(--card));
+  }
+}
+
+.terrain-emoji {
+  font-size: 2.8rem;
+  z-index: 1;
+}
+
+.terrain-status {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+}
+
+.terrain-body { padding: 1rem; }
+
+.terrain-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.terrain-type {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.terrain-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.meta-item {
+  background: var(--bg3);
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.meta-label { font-size: 0.68rem; color: var(--muted); margin-bottom: 2px; }
+.meta-value { font-size: 0.82rem; font-weight: 600; }
+.meta-value.green { color: var(--green); }
+
+.equipements {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.eq-tag {
+  font-size: 0.68rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 2px 8px;
+  border-radius: 5px;
+}
+
+.terrain-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--muted);
+  animation: fadeUp 0.5s ease;
+
+  .empty-icon { font-size: 4rem; margin-bottom: 1rem; opacity: 0.3; }
+  h3 { font-family: 'Syne', sans-serif; font-size: 1.2rem; margin-bottom: 8px; color: var(--text); }
+  p  { font-size: 0.875rem; }
+}
+.btn-statut {
+  background: rgba(167,139,250,0.1);
+  color: var(--purple);
+  border: 1px solid rgba(167,139,250,0.25);
+  &:hover { background: rgba(167,139,250,0.2); }
+}
+
+@media (max-width: 1100px) { .terrains-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px)  { .terrains-grid { grid-template-columns: 1fr; } }

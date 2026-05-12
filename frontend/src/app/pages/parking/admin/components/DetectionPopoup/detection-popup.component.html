@@ -1,0 +1,68 @@
+<div class="detections-container" *ngIf="hasDetections">
+
+    <div class="detection-card" *ngFor="let d of detections">
+
+        <div class="detection-header">
+            <div class="pulse-dot"></div>
+            <span class="detection-title">Nouvelle détection caméra</span>
+        </div>
+
+        <div class="plate-image-wrapper">
+            <img *ngIf="d.imageEntree" [src]="'data:image/jpeg;base64,' + d.imageEntree"
+                alt="Photo plaque {{ d.matricule }}" class="plate-image" />
+            <div *ngIf="!d.imageEntree" class="plate-no-image">
+                <mat-icon>camera_alt</mat-icon>
+                <span>Photo non disponible</span>
+            </div>
+        </div>
+
+        <div class="matricule-display">
+            <span class="matricule-label">Matricule lu :</span>
+            <span class="matricule-value">{{ d.matricule }}</span>
+        </div>
+
+        <div class="price-context" *ngIf="parkingActuel; else noParking">
+            <div class="price-banner">
+                <mat-icon>payments</mat-icon>
+                <div class="price-details">
+                    <span class="label">Tarif Spontané ({{ parkingActuel.nom }})</span>
+                    <span class="amount">{{ prixAffiche }} DT</span>
+                </div>
+            </div>
+            <div class="promo-indicator" *ngIf="parkingActuel.prixPromos > 0">
+                <mat-icon>stars</mat-icon>
+                <span>Promotion appliquée au lieu de {{ parkingActuel.prixInitial }} DT</span>
+            </div>
+        </div>
+
+        <ng-template #noParking>
+            <div class="warning-box">
+                <mat-icon>warning</mat-icon>
+                <span>Veuillez sélectionner votre parking en haut pour voir les tarifs.</span>
+            </div>
+        </ng-template>
+
+        <div class="question">
+            Ce client est-il <strong>spontané</strong> (sans réservation en ligne) ?
+        </div>
+
+        <div class="action-buttons">
+            <button mat-flat-button color="primary" class="btn-oui" (click)="confirmerSpontane(d)"
+                [disabled]="!parkingActuel">
+                <mat-icon>check_circle</mat-icon>
+                OUI — Créer Ticket
+            </button>
+
+            <button mat-stroked-button class="btn-non" (click)="pasSpontane(d)">
+                <mat-icon>qr_code_scanner</mat-icon>
+                NON — Client avec QR
+            </button>
+        </div>
+
+        <div class="timer-hint">
+            <mat-icon class="timer-icon">schedule</mat-icon>
+            Disparaît automatiquement après 1 min
+        </div>
+
+    </div>
+</div>

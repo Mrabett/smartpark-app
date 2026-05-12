@@ -1,0 +1,117 @@
+<div class="page-content">
+  <div class="form-wrapper">
+
+    <!-- HEADER -->
+    <div class="form-header">
+      <div class="form-header-icon">🏟️</div>
+      <div>
+        <h1>{{ isEdit ? 'Modifier le terrain' : 'Nouveau terrain' }}</h1>
+        <p>{{ isEdit ? 'Modifiez les informations du terrain' : 'Remplissez les informations du nouveau terrain' }}</p>
+      </div>
+    </div>
+
+    <!-- ERREUR -->
+    <div *ngIf="erreur" class="alert-error">
+      ⚠️ {{ erreur }}
+    </div>
+
+    <!-- FORMULAIRE -->
+    <div class="sp-card">
+      <form (ngSubmit)="submit()">
+
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label class="form-label">Nom du terrain *</label>
+            <input class="form-input"
+                   [(ngModel)]="terrain.nom"
+                   name="nom" required
+                   placeholder="ex: Terrain Football A">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Type de terrain *</label>
+            <select class="form-select"
+                    [(ngModel)]="terrain.type"
+                    name="type">
+              <option *ngFor="let t of types" [value]="t.value">
+                {{ t.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Capacité (joueurs) *</label>
+            <input type="number" class="form-input"
+                   [(ngModel)]="terrain.capacite"
+                   name="capacite" required
+                   placeholder="ex: 22">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tarif / heure (DT) *</label>
+            <input type="number" class="form-input"
+                   [(ngModel)]="terrain.tarifHeure"
+                   name="tarifHeure" required
+                   placeholder="ex: 100">
+          </div>
+
+          <div class="form-group" *ngIf="isEdit">
+            <label class="form-label">Statut</label>
+            <select class="form-select"
+                    [(ngModel)]="terrain.statut"
+                    name="statut">
+              <option *ngFor="let s of statuts" [value]="s.value">
+                {{ s.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group full">
+            <label class="form-label">Description</label>
+            <textarea class="form-input"
+                      [(ngModel)]="terrain.description"
+                      name="description"
+                      rows="3"
+                      placeholder="Description du terrain..."></textarea>
+          </div>
+
+          <!-- EQUIPEMENTS -->
+          <div class="form-group full">
+            <label class="form-label">Équipements</label>
+            <div class="eq-input-row">
+              <input class="form-input"
+                     [(ngModel)]="eqInput"
+                     name="eqInput"
+                     placeholder="ex: Vestiaires, Eclairage...">
+              <button type="button" class="btn btn-ghost eq-btn"
+                      (click)="addEq()">
+                ➕ Ajouter
+              </button>
+            </div>
+            <div class="eq-tags" *ngIf="terrain.equipements && terrain.equipements.length > 0">
+              <span class="eq-tag"
+                    *ngFor="let e of terrain.equipements; let i = index"
+                    (click)="removeEq(i)">
+                {{ e }} ✕
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            {{ isEdit ? '✅ Modifier le terrain' : '✅ Créer le terrain' }}
+          </button>
+          <a routerLink="/terrains" class="btn btn-ghost">
+            ← Annuler
+          </a>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>

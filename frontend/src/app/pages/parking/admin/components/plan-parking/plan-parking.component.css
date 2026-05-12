@@ -1,0 +1,47 @@
+/* Le conteneur du plan */
+.map-container {
+    position: relative; /* Indispensable pour que les spots se placent par rapport à ce cadre */
+    display: inline-block;
+    width: 100%;
+    max-width: 800px;
+    border: 2px dashed #3b4253;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #161d31;
+}
+
+/* L'image du parking (la photo prise par l'admin) */
+.parking-photo {
+    width: 100%;
+    display: block;
+    opacity: 0.6; /* On baisse l'opacité pour que les spots soient bien visibles */
+}
+
+/* Le style des spots (les petits carrés p2, p8) */
+.spot-marker {
+    position: absolute; /* Ils "flottent" sur l'image */
+    width: 40px;
+    height: 40px;
+    background: #22c55e; /* Vert par défaut */
+    border: 2px solid white;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    font-size: 10px;
+}
+
+.spot-marker.reserved { background: #ef4444; } /* Rouge si occupé */
+
+/* La zone d'upload en haut */
+.upload-zone {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: #1e293b;
+    border-radius: 10px;
+    text-align: center;
+}

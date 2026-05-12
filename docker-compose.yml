@@ -1,0 +1,48 @@
+version: '3.8'
+
+networks:
+  smartpark-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+
+services:
+
+  mongodb:
+    image: mongo:7.0
+    container_name: smartpark-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: smartpark_db
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - smartpark-network
+
+  backend:
+    image: mrabethedi0/smartpark-backend:v2
+    container_name: smartpark-backend
+    restart: unless-stopped
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/smartpark_db
+      SPRING_DATA_MONGODB_DATABASE: smartpark_db
+      SERVER_PORT: '8082'
+      JWT_SECRET: '413F4428472B4B6250655368566D5970337336763979244226452948404D6351'
+    ports:
+      - '8082:8082'
+    depends_on:
+      - mongodb
+    networks:
+      - smartpark-network
+
+  frontend:
+    image: mrabethedi0/smartpark-frontend:v7
+    container_name: smartpark-frontend
+    restart: unless-stopped
+    ports:
+      - '80:80'
+    depends_on:
+      - backend
+    networks:
+      - smartpark-network

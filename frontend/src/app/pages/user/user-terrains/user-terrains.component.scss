@@ -1,0 +1,214 @@
+.user-page { min-height: 100vh; }
+
+.user-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,15,20,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex; align-items: center;
+  justify-content: space-between; height: 64px;
+}
+
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 1.2rem;
+}
+
+.logo-icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  box-shadow: 0 0 16px rgba(0,201,127,0.3);
+}
+
+.nav-links {
+  display: flex; gap: 4px;
+  a {
+    padding: 7px 16px; border-radius: 8px;
+    color: var(--muted); text-decoration: none;
+    font-size: 0.875rem; font-weight: 500;
+    transition: all 0.2s;
+    &:hover { color: var(--text); background: var(--bg3); }
+    &.active {
+      color: var(--green); background: var(--green-glow);
+      border: 1px solid var(--border2);
+    }
+  }
+}
+
+.nav-right { display: flex; align-items: center; }
+
+.role-badge {
+  font-size: 0.75rem; font-weight: 700;
+  padding: 5px 14px; border-radius: 20px;
+  &.user {
+    background: rgba(59,158,255,0.15);
+    color: var(--blue);
+    border: 1px solid rgba(59,158,255,0.3);
+  }
+}
+
+.user-hero {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 1rem;
+  margin-bottom: 2rem;
+  animation: fadeUp 0.5s ease both;
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem; font-weight: 800;
+    letter-spacing: -0.02em; margin-bottom: 6px;
+    span { color: var(--green); }
+  }
+  p { color: var(--muted); font-size: 0.9rem; }
+}
+
+.search-filter-bar {
+  display: flex; flex-direction: column; gap: 12px;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.5s 0.1s ease both;
+  opacity: 0; animation-fill-mode: forwards;
+}
+
+.search-box {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px 16px;
+  transition: all 0.2s;
+  &:focus-within {
+    border-color: var(--border2);
+    box-shadow: 0 0 0 3px rgba(0,201,127,0.08);
+  }
+  input {
+    background: none; border: none; outline: none;
+    color: var(--text); font-family: 'Inter', sans-serif;
+    font-size: 0.9rem; flex: 1;
+    &::placeholder { color: var(--muted); }
+  }
+}
+
+.filtres { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.tab {
+  padding: 7px 16px; border-radius: 8px;
+  font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--border);
+  background: var(--card2); color: var(--muted);
+  transition: all 0.2s; font-family: 'Inter', sans-serif;
+  &:hover, &.active {
+    background: var(--green-glow);
+    border-color: var(--border2); color: var(--green);
+  }
+}
+
+.terrains-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  animation: fadeUp 0.5s 0.2s ease both;
+  opacity: 0; animation-fill-mode: forwards;
+}
+
+.terrain-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 18px; overflow: hidden;
+  transition: all 0.3s;
+  animation: fadeUp 0.5s ease both;
+  opacity: 0; animation-fill-mode: forwards;
+  &:hover {
+    border-color: rgba(0,201,127,0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  }
+}
+
+.terrain-img {
+  height: 130px; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  &.bg-foot   { background: linear-gradient(135deg, #0d4d2a, #1a7a44); }
+  &.bg-padel  { background: linear-gradient(135deg, #0d2d4d, #1a4a7a); }
+  &.bg-tennis { background: linear-gradient(135deg, #4d3d0d, #7a621a); }
+  &.bg-basket { background: linear-gradient(135deg, #4d1a0d, #7a2e1a); }
+  &::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 40%, var(--card));
+  }
+}
+
+.terrain-emoji { font-size: 3.2rem; z-index: 1; }
+
+.statut-badge {
+  position: absolute; top: 10px; right: 10px; z-index: 2;
+  font-size: 0.7rem; font-weight: 700;
+  padding: 4px 12px; border-radius: 20px;
+  &.disponible {
+    background: rgba(0,201,127,0.2); color: var(--green);
+    border: 1px solid rgba(0,201,127,0.35);
+  }
+  &.indisponible {
+    background: rgba(255,77,106,0.2); color: var(--red);
+    border: 1px solid rgba(255,77,106,0.35);
+  }
+}
+
+.terrain-body { padding: 1.1rem; }
+
+.terrain-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem; font-weight: 700; margin-bottom: 4px;
+}
+
+.terrain-type { font-size: 0.78rem; color: var(--muted); margin-bottom: 14px; }
+
+.terrain-meta {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 6px; margin-bottom: 12px;
+}
+
+.meta-item {
+  background: var(--bg3); border-radius: 8px; padding: 8px 10px;
+}
+
+.meta-label { font-size: 0.68rem; color: var(--muted); margin-bottom: 3px; }
+.meta-value { font-size: 0.85rem; font-weight: 600; }
+.meta-value.green { color: var(--green); }
+
+.equipements {
+  display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 14px;
+}
+
+.eq-tag {
+  font-size: 0.68rem; background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--muted); padding: 3px 9px; border-radius: 5px;
+}
+
+.reserve-btn {
+  width: 100%; justify-content: center;
+  padding: 11px; font-size: 0.9rem;
+  &.disabled-btn {
+    opacity: 0.5; cursor: not-allowed;
+    background: var(--card2);
+    color: var(--muted); box-shadow: none;
+  }
+}
+
+.empty-state {
+  text-align: center; padding: 4rem 2rem; color: var(--muted);
+  .empty-icon { font-size: 4rem; margin-bottom: 1rem; opacity: 0.3; }
+  h3 {
+    font-family: 'Syne', sans-serif; font-size: 1.2rem;
+    margin-bottom: 8px; color: var(--text);
+  }
+}
+
+@media (max-width: 1100px) { .terrains-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) {
+  .terrains-grid { grid-template-columns: 1fr; }
+  .user-nav { padding: 0 1rem; }
+  .user-hero { flex-direction: column; }
+}

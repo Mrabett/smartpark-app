@@ -1,0 +1,205 @@
+<div class="page-content">
+  <div class="form-page-layout">
+
+    <!-- COLONNE GAUCHE : Formulaire -->
+    <div class="form-col">
+      <div class="sp-card">
+
+        <div class="form-card-header">
+          <h2>📅 Nouvelle Réservation</h2>
+          <p>Choisissez votre terrain et créneau</p>
+        </div>
+
+        <div *ngIf="erreur" class="alert-error">⚠️ {{ erreur }}</div>
+
+        <form (ngSubmit)="submit()">
+
+          <div class="sp-field">
+            <label class="form-label">🏟️ Terrain *</label>
+            <select class="form-input"
+                    [(ngModel)]="reservation.terrainId"
+                    name="terrainId" required
+                    (ngModelChange)="updateTarif()">
+              <option value="">-- Choisir un terrain --</option>
+              <option *ngFor="let t of terrains"
+                      [value]="t.id"
+                      [disabled]="t.statut === 'MAINTENANCE'">
+                {{ t.statut === 'MAINTENANCE' ? '🔧' : '✅' }}
+                {{ t.nom }} — {{ t.type }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="sp-field">
+              <label class="form-label">👤 Nom complet *</label>
+              <input class="form-input"
+                     [(ngModel)]="reservation.clientNom"
+                     name="clientNom" required
+                     placeholder="ex: Ahmed Ben Ali">
+            </div>
+            <div class="sp-field">
+              <label class="form-label">📱 Téléphone *</label>
+              <input class="form-input"
+                     [(ngModel)]="reservation.clientTel"
+                     name="clientTel" required
+                     placeholder="ex: 55 123 456">
+            </div>
+          </div>
+
+          <div class="sp-field">
+            <label class="form-label">📧 Email *</label>
+            <input type="email" class="form-input"
+                   [(ngModel)]="reservation.clientEmail"
+                   name="clientEmail" required readonly
+                   placeholder="ex: ahmed@email.com">
+          </div>
+
+          <div class="sp-field">
+            <label class="form-label">📅 Date *</label>
+            <input type="date" class="form-input"
+                   [(ngModel)]="reservation.dateReservation"
+                   name="dateReservation" required
+                   (ngModelChange)="updateTarif()">
+          </div>
+
+          <div class="form-row">
+            <div class="sp-field">
+              <label class="form-label">🕐 Heure début *</label>
+              <input type="time" class="form-input"
+                     [(ngModel)]="reservation.heureDebut"
+                     name="heureDebut" required
+                     (ngModelChange)="updateTarif()">
+            </div>
+            <div class="sp-field">
+              <label class="form-label">🕑 Heure fin *</label>
+              <input type="time" class="form-input"
+                     [(ngModel)]="reservation.heureFin"
+                     name="heureFin" required
+                     (ngModelChange)="updateTarif()">
+            </div>
+          </div>
+
+          <div class="sp-field">
+            <label class="form-label">📝 Notes</label>
+            <textarea class="form-input"
+                      [(ngModel)]="reservation.notes"
+                      name="notes" rows="2"
+                      placeholder="Informations supplémentaires...">
+            </textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary"
+                  style="width:100%;margin-top:0.5rem;justify-content:center;"
+                  [disabled]="loading">
+            {{ loading ? '⏳ Confirmation...' : '✅ Confirmer la réservation' }}
+          </button>
+
+          <a routerLink="/reservations" class="btn btn-ghost"
+             style="width:100%;margin-top:0.5rem;justify-content:center;">
+            ← Annuler
+          </a>
+
+        </form>
+      </div>
+    </div>
+
+    <!-- COLONNE DROITE : Prix dynamique -->
+    <div class="price-col">
+
+      <!-- Loading -->
+      <div *ngIf="loadingTarif" class="sp-card price-loading">
+        <div class="loading-spinner">⏳</div>
+        <p>Calcul du prix en cours...</p>
+      </div>
+
+      <!-- Tarif calculé -->
+      <div *ngIf="tarifInfo && !loadingTarif" class="sp-card price-card">
+
+        <div class="price-header"
+             [style.background]="'linear-gradient(135deg,' +
+               tarifInfo.couleur + '22, transparent)'">
+          <div class="price-label">💰 Prix actuel</div>
+          <div class="price-main" [style.color]="tarifInfo.couleur">
+            {{ tarifInfo.tarifFinal }} DT/h
+          </div>
+          <div class="price-niveau">
+            {{ getNiveauIcon(tarifInfo.niveau) }}
+            {{ getNiveauLabel(tarifInfo.niveau) }}
+          </div>
+        </div>
+
+        <div class="price-detail">
+          <div class="price-row">
+            <span>Prix de base</span>
+            <span>{{ tarifInfo.tarifBase }} DT/h</span>
+          </div>
+          <div class="price-row" *ngIf="tarifInfo.supplement > 0"
+               style="color:#ef4444">
+            <span>Supplément demande</span>
+            <span>+{{ tarifInfo.supplement }} DT/h</span>
+          </div>
+          <div class="price-row" *ngIf="tarifInfo.economie > 0"
+               style="color:#22c55e">
+            <span>🎁 Réduction</span>
+            <span>-{{ tarifInfo.economie }} DT/h</span>
+          </div>
+          <div class="price-divider"></div>
+          <div class="price-row total">
+            <span>Prix final</span>
+            <span [style.color]="tarifInfo.couleur">
+              <strong>{{ tarifInfo.tarifFinal }} DT/h</strong>
+            </span>
+          </div>
+          <div class="price-total-box" *ngIf="montantEstime > 0">
+            <span>💳 Total estimé</span>
+            <span class="total-amount">{{ montantEstime }} DT</span>
+          </div>
+        </div>
+
+        <div class="price-factors"
+             *ngIf="tarifInfo.details &&
+                    (tarifInfo.details | keyvalue).length > 0">
+          <div class="factors-title">📌 Facteurs appliqués :</div>
+          <div *ngFor="let d of tarifInfo.details | keyvalue"
+               class="factor-item">
+            <span class="factor-dot"></span>
+            {{ d.value }}
+          </div>
+        </div>
+
+        <div class="price-suggestions" *ngIf="suggestions.length > 0">
+          <div class="suggestions-title">💡 Créneaux moins chers :</div>
+          <div class="suggestions-list">
+            <button *ngFor="let s of suggestions"
+                    (click)="appliquerSuggestion(s.heure)"
+                    class="suggestion-btn">
+              <span class="sug-heure">{{ s.heure }}</span>
+              <span class="sug-prix" [style.color]="s.couleur">
+                {{ s.tarifFinal }} DT/h
+              </span>
+              <span class="sug-arrow">→</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- État vide -->
+      <div *ngIf="!tarifInfo && !loadingTarif"
+           class="sp-card price-empty">
+        <div class="empty-icon-price">💰</div>
+        <h3>Prix en temps réel</h3>
+        <p>Sélectionnez un terrain, une date et une heure
+           pour voir le prix dynamique</p>
+        <div class="price-features">
+          <div class="feature">📈 Prix selon la demande</div>
+          <div class="feature">🕐 Heures de pointe (+50%)</div>
+          <div class="feature">📅 Weekend (+30%)</div>
+          <div class="feature">💡 Suggestions économiques</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

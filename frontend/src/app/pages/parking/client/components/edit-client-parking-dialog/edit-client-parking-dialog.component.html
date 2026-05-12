@@ -1,0 +1,86 @@
+<div class="premium-details-container">
+  <h2 mat-dialog-title class="premium-header">
+    <div class="header-content">
+      <mat-icon class="glow-icon">info_outline</mat-icon>
+      <div class="title-group">
+        <span class="main-title">Détails du Parking</span>
+        <span class="sub-title">{{ data?.nom }}</span>
+      </div>
+    </div>
+  </h2>
+
+  <mat-dialog-content class="premium-content custom-scroll" [formGroup]="parkingForm">
+    <div class="form-grid">
+      
+      <div class="input-row">
+        <mat-form-field appearance="outline" class="dark-field">
+          <mat-label>Nom du Parking</mat-label>
+          <mat-icon matPrefix>business</mat-icon>
+          <input matInput formControlName="nom" readonly>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="dark-field">
+          <mat-label>Type de véhicule</mat-label>
+          <mat-icon matPrefix>directions_car</mat-icon>
+          <mat-select formControlName="typeParking">
+            <mat-option *ngFor="let type of typeOptions" [value]="type">{{ type }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="dark-field full-width">
+        <mat-label>Description & Services</mat-label>
+        <textarea matInput formControlName="description" rows="3"></textarea>
+      </mat-form-field>
+
+      <div class="pricing-card">
+        <div class="price-header">CONFIGURATION TARIFAIRE</div>
+        <div class="input-row">
+          <mat-form-field appearance="outline" class="dark-field" *ngIf="!parkingForm.get('isEvent')?.value">
+            <mat-label>Tarif Standard</mat-label>
+            <input matInput type="number" formControlName="prixInitial">
+            <span matSuffix>TND</span>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="dark-field highlight-field">
+            <mat-label>Tarif Actuel (PROMO)</mat-label>
+            <input matInput type="number" formControlName="prixPromos">
+            <span matSuffix>TND</span>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="input-row">
+        <mat-form-field appearance="outline" class="dark-field">
+          <mat-label>Disponible du</mat-label>
+          <input matInput [matDatepicker]="pickerDebut" formControlName="dateDebutPromos">
+          <mat-datepicker-toggle matIconSuffix [for]="pickerDebut"></mat-datepicker-toggle>
+          <mat-datepicker #pickerDebut></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="dark-field">
+          <mat-label>Jusqu'au</mat-label>
+          <input matInput [matDatepicker]="pickerFin" formControlName="dateFinPromos">
+          <mat-datepicker-toggle matIconSuffix [for]="pickerFin"></mat-datepicker-toggle>
+          <mat-datepicker #pickerFin></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="event-banner" *ngIf="parkingForm.get('isEvent')?.value">
+        <mat-icon>campaign</mat-icon>
+        <div class="banner-text">
+          <strong>ÉVÉNEMENT SPÉCIAL EN COURS</strong>
+          <span>Les tarifs sont adaptés à la demande actuelle.</span>
+        </div>
+      </div>
+
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="premium-actions">
+    <button mat-button class="btn-cancel" (click)="close()">FERMER</button>
+    <button mat-raised-button class="btn-confirm" (click)="confirm()">
+      RÉSERVER UNE PLACE <mat-icon>chevron_right</mat-icon>
+    </button>
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,90 @@
+<div class="fullscreen-app">
+  <header class="app-header">
+    <div class="title-group">
+      <div class="logo-icon" style="width: 32px; height: 32px; font-size: 16px;">
+        <mat-icon style="color: white; font-size: 20px; width: 20px; height: 20px;">dashboard</mat-icon>
+      </div>
+      <h1>Supervision du Parking : <strong>{{ parking.nom }}</strong></h1>
+    </div>
+    <button class="btn btn-ghost" style="padding: 6px;" (click)="close()" matTooltip="Fermer le plan">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <aside class="control-side-panel">
+    <section class="panel-section">
+      <h3><mat-icon>add_location</mat-icon> {{ editingSpotId ? 'Modifier la place' : 'Nouveau Spot' }}</h3>
+      <form [formGroup]="spotForm" (ngSubmit)="addSpot()" class="vertical-form">
+        <div class="sp-field">
+          <label class="form-label">Nom de la place (ex: A1)</label>
+          <input type="text" class="form-input" formControlName="nom" [class.invalid]="spotForm.get('nom')?.invalid && spotForm.get('nom')?.touched">
+          <small class="error-text" *ngIf="spotForm.get('nom')?.invalid && spotForm.get('nom')?.touched">Nom requis (max 5 caractères)</small>
+        </div>
+
+        <div class="sp-field">
+          <label class="form-label">Description</label>
+          <input type="text" class="form-input" formControlName="description">
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit" [disabled]="spotForm.invalid">
+            <mat-icon style="font-size: 18px; width: 18px; height: 18px; margin-right: 4px;">{{ editingSpotId ? 'save' : 'add' }}</mat-icon>
+            {{ editingSpotId ? 'Enregistrer' : 'Créer' }}
+          </button>
+          <button class="btn btn-secondary" *ngIf="editingSpotId" type="button" (click)="resetForm()">Annuler</button>
+        </div>
+      </form>
+    </section>
+
+    <div style="height: 1px; background: var(--border); margin: 15px 0;"></div>
+
+    <section class="panel-section ia-section">
+      <h3 style="color: var(--purple);"><mat-icon>auto_awesome</mat-icon> Intelligence Artificielle</h3>
+      <p style="font-size: 0.85rem; margin-bottom: 10px;">Importez un plan pour générer les places automatiquement.</p>
+      <p style="font-size: 0.75rem; color: var(--muted); margin-bottom: 15px;">Le nom du fichier doit être "parking_photo.jpg"</p>
+      <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
+      <button class="btn" style="background: rgba(167, 139, 250, 0.1); color: var(--purple); border: 1px solid var(--purple); width: 100%; justify-content: center;" (click)="fileInput.click()">
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px; margin-right: 4px;">document_scanner</mat-icon>
+        Scanner un document
+      </button>
+    </section>
+
+    <div class="side-legend">
+      <div class="legend-item"><span class="dot libre"></span> Libre</div>
+      <div class="legend-item"><span class="dot occupe"></span> Occupé</div>
+      <div class="legend-item"><span class="dot reserve"></span> Réservé</div>
+      <div class="legend-item"><span class="dot maintenance"></span> Maintenance</div>
+    </div>
+  </aside>
+
+  <main class="map-viewport" cdkDropListGroup>
+    <div class="canvas-container">
+      <div *ngFor="let spot of spots" class="spot-card" [ngClass]="'statut-' + spot.statut"
+        [style.left.%]="((spot.x || 0) / 800) * 100" [style.top.%]="((spot.y || 0) / 600) * 100" cdkDrag
+        [cdkDragBoundary]="'.canvas-container'" (cdkDragEnded)="onDragEnded($event, spot)">
+
+        <div class="spot-content">
+          <span class="spot-id">{{ spot.nom }}</span>
+          <mat-icon class="spot-icon">
+            {{ spot.statut === 'OCCUPE' ? 'directions_car' : 'location_on' }}
+          </mat-icon>
+        </div>
+
+        <div class="spot-hover-menu">
+          <button mat-icon-button [matMenuTriggerFor]="m" class="small-btn" style="background: var(--card2) !important;">
+            <mat-icon style="color: var(--text);">more_vert</mat-icon>
+          </button>
+          <mat-menu #m="matMenu">
+            <button mat-menu-item (click)="updateStatus(spot, 'LIBRE')">Libre</button>
+            <button mat-menu-item (click)="updateStatus(spot, 'RESERVE')">Réserver</button>
+            <button mat-menu-item (click)="updateStatus(spot, 'MAINTENANCE')">Maintenance</button>
+            <div style="height: 1px; background: var(--border); margin: 5px 0;"></div>
+            <button mat-menu-item (click)="editSpot(spot)">Modifier</button>
+            <button mat-menu-item (click)="openReservation(spot)">Voir Résa</button>
+            <button mat-menu-item style="color: var(--red);" (click)="deleteSpot(spot.id!)">Supprimer</button>
+          </mat-menu>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

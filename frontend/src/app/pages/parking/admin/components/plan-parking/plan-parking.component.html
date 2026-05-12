@@ -1,0 +1,33 @@
+<div class="smart-parking-container">
+
+  <div class="upload-zone">
+    <h3>📸 Scanner le plan du parking</h3>
+    <input type="file" (change)="onImageUpload($event)" accept="image/*">
+    <p style="color: #82868b; font-size: 12px; margin-top: 10px;">
+      Uploadez une photo pour générer le plan interactif
+    </p>
+  </div>
+
+  <div class="map-container" *ngIf="imagePreview" (click)="onMapClick($event)" style="cursor: crosshair;">
+
+    <img [src]="imagePreview" class="parking-photo" alt="Plan Parking">
+
+    <div *ngFor="let s of spots" class="spot-marker" [ngClass]="{'reserved': s.statut !== 'LIBRE'}"
+      [ngStyle]="calculatePosition(s.x, s.y)">
+      {{ s.nom }}
+    </div>
+
+  </div>
+
+  <p *ngIf="imagePreview" style="color: #22c55e; margin-top: 10px;">
+    💡 Cliquez sur l'image pour ajouter une place précisément.
+  </p>
+
+  <div *ngIf="!imagePreview" style="text-align: center; color: #82868b; padding: 50px;">
+    <mat-icon style="font-size: 50px; width: 50px; height: 50px;">add_a_photo</mat-icon>
+    <p>Aucune photo chargée. Veuillez sélectionner une photo du parking.</p>
+  </div>
+
+
+
+</div>

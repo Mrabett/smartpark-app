@@ -1,0 +1,59 @@
+<div class="fullscreen-app">
+  <header class="app-header">
+    <div class="title-group">
+      <div class="logo-icon" style="width: 32px; height: 32px; font-size: 16px;">
+        <mat-icon style="color: white; font-size: 20px; width: 20px; height: 20px;">location_on</mat-icon>
+      </div>
+      <h1>Sélectionner une place pour <strong>{{ parking.nom }}</strong></h1>
+    </div>
+    <div class="title-group">
+      <span class="status-indicator" style="display: flex; align-items: center; background: var(--card2); padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border);">
+        <span class="pulse-dot" style="display:inline-block; width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:8px;box-shadow:0 0 8px var(--green);"></span>
+        <span style="font-size: 0.85rem; font-weight: 500; color: var(--text);">{{ getLibreCount() }} places disponibles</span>
+      </span>
+      <button class="btn btn-ghost" style="padding: 6px; margin-left: 15px;" (click)="close()" matTooltip="Annuler">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </header>
+
+  <aside class="control-side-panel">
+    <div class="instruction-box">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <mat-icon>info</mat-icon>
+        <strong style="font-family: var(--font-title);">Choix de la Place</strong>
+      </div>
+      <div style="font-size: 0.9rem; line-height: 1.5;">
+        Sélectionnez une place LIBRE sur le plan pour finaliser votre réservation.
+      </div>
+    </div>
+
+    <div class="side-legend">
+      <div class="legend-item"><span class="dot libre"></span> Libre</div>
+      <div class="legend-item"><span class="dot occupe"></span> Occupé</div>
+      <div class="legend-item"><span class="dot reserve"></span> Réservé / Indisponible</div>
+      <div class="legend-item"><span class="dot maintenance"></span> Maintenance</div>
+    </div>
+  </aside>
+
+  <main class="map-viewport">
+    <div class="canvas-container">
+      <div *ngFor="let spot of spots; trackBy: trackBySpotId" 
+           class="spot-card clickable" 
+           [ngClass]="getSpotClass(spot)"
+           [style.left.%]="((spot.x || 0) / 800) * 100" 
+           [style.top.%]="((spot.y || 0) / 600) * 100"
+           [matTooltip]="getSpotTooltip(spot)"
+           (click)="selectSpot(spot)">
+        
+        <div class="spot-content">
+          <span class="spot-id">{{ spot.nom }}</span>
+          <mat-icon class="spot-icon">
+            {{ getSpotIcon(spot) }}
+          </mat-icon>
+        </div>
+        
+      </div>
+    </div>
+  </main>
+</div>

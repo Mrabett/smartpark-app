@@ -1,0 +1,97 @@
+<div class="sp-page container">
+  <!-- Hero Section -->
+  <div class="sp-hero">
+    <div>
+      <h1 class="sp-hero-title">Nos Parkings <span>Disponibles</span></h1>
+      <div class="sp-hero-sub">
+        <div class="live-dot"></div>
+        Sélection rapide et en temps réel
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="sp-filters" style="margin-bottom: 2rem;">
+    <div class="sp-search" style="flex: 1; max-width: 350px;">
+      <mat-icon class="si">filter_list</mat-icon>
+      <select [(ngModel)]="selectedType" (ngModelChange)="applyFilter()"
+        style="background: transparent; border: none; color: var(--text); outline: none; flex: 1; font-family: 'DM Sans', sans-serif;">
+        <option value="" style="background: var(--bg2);">Tous les types</option>
+        <option *ngFor="let type of parkingTypes" [value]="type" style="background: var(--bg2);">
+          {{ type }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <button mat-button routerLink="/admin/recettes" routerLinkActive="active-link">
+    <mat-icon>monetization_on</mat-icon>
+    <span>Gestion Recettes</span>
+  </button>
+
+  <!-- Grid des Parkings -->
+  <div class="parking-grid" *ngIf="filteredParkings.length > 0">
+    <div class="sp-card" *ngFor="let element of filteredParkings">
+      <!-- Card Header -->
+      <div class="sp-card-header">
+        <div class="sch-title">
+          <mat-icon style="font-size: 20px; width: 20px; height: 20px; color: var(--green);">local_parking</mat-icon>
+          {{element.nom}}
+        </div>
+        <span class="sp-badge"
+          [ngClass]="$any(element.typeParking) === 'VOITURE' || $any(element.typeParking) === 'VOITURE_HANDICAPE' ? 'blue' : 'purple'">
+          {{element.typeParking || 'Standard'}}
+        </span>
+      </div>
+
+      <!-- Card Body -->
+      <div class="sp-card-body">
+        <p style="color: var(--text2); font-size: 0.85rem; margin-bottom: 1rem; line-height: 1.4; min-height: 40px;">
+          {{element.description || 'Aucune description disponible pour ce parking.'}}
+        </p>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <div style="font-size: 0.8rem; color: var(--text3); font-weight: 700; text-transform: uppercase;">Tarif Normal
+          </div>
+          <div style="font-size: 0.9rem; font-weight: 500; color: var(--text);">{{element.prixInitial}} TND</div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;"
+          *ngIf="element.prixPromos < element.prixInitial">
+          <div style="font-size: 0.8rem; color: var(--text3); font-weight: 700; text-transform: uppercase;">Promo
+            Actuelle</div>
+          <div class="sp-badge green">
+            {{element.prixPromos}} TND
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-size: 0.8rem; color: var(--text3); font-weight: 700; text-transform: uppercase;">Places
+            Totales</div>
+          <div style="font-size: 0.9rem; font-weight: 500; color: var(--text);">{{element.spots?.length || 0}}</div>
+        </div>
+      </div>
+
+      <!-- Card Footer Actions -->
+      <div class="sp-card-footer" style="justify-content: flex-end;">
+        <button class="sp-btn secondary sm" (click)="viewReservations(element)" aria-label="Mes réservations"
+          style="margin-right: 8px;">
+          <mat-icon style="font-size: 16px; width: 16px; height: 16px; margin-right: 4px;">list_alt</mat-icon> Mes
+          Réservations
+        </button>
+        <button class="sp-btn primary sm" (click)="openSpotManager(element)" aria-label="Voir les places">
+          <mat-icon style="font-size: 16px; width: 16px; height: 16px; margin-right: 4px;">directions_car</mat-icon>
+          Voir Places Libres
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="sp-empty" *ngIf="filteredParkings.length === 0">
+    <mat-icon class="sp-empty-icon">search_off</mat-icon>
+    <h3>Aucun parking trouvé</h3>
+    <p>Aucun parking de ce type n'est disponible pour le moment.</p>
+    <button class="sp-btn ghost" (click)="selectedType=''; applyFilter()">Réinitialiser le filtre</button>
+  </div>
+</div>

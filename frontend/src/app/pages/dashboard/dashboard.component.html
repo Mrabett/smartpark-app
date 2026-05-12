@@ -1,0 +1,370 @@
+<div class="page-content">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-text">
+      <h1>Dashboard <span>SmartPark</span></h1>
+      <p>
+        <span class="live-dot"></span>
+        Système en ligne · {{ totalTerrains }} terrains
+      </p>
+    </div>
+    <div class="hero-actions">
+      <a routerLink="/terrains/nouveau" class="btn btn-primary">
+        ➕ Nouveau Terrain
+      </a>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card green">
+      <div class="stat-header">
+        <span class="stat-label">Disponibles</span>
+        <div class="stat-icon green">✅</div>
+      </div>
+      <div class="stat-value green">{{ terrainsDisponibles }}</div>
+      <div class="stat-sub">sur {{ totalTerrains }} terrains</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-header">
+        <span class="stat-label">Occupés</span>
+        <div class="stat-icon red">🔴</div>
+      </div>
+      <div class="stat-value red">{{ terrainsOccupes }}</div>
+      <div class="stat-sub">Taux : {{ getTauxOccupation() }}%</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-header">
+        <span class="stat-label">Réservations</span>
+        <div class="stat-icon amber">📅</div>
+      </div>
+      <div class="stat-value amber">{{ totalReservations }}</div>
+      <div class="stat-sub">
+        <span class="trend-up">✓ {{ reservationsConfirmees }} confirmées</span>
+      </div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-header">
+        <span class="stat-label">Revenus</span>
+        <div class="stat-icon purple">💰</div>
+      </div>
+      <div class="stat-value purple">{{ totalRevenus }} DT</div>
+      <div class="stat-sub">Réservations confirmées</div>
+    </div>
+  </div>
+
+  <!-- WIDGET TARIFICATION -->
+  <div class="sp-card tarif-widget">
+    <div class="section-header">
+      <div class="section-title">💰 Tarification Dynamique</div>
+      <a routerLink="/tarification" class="btn btn-ghost"
+         style="font-size:0.78rem;padding:5px 12px;">Voir tout →</a>
+    </div>
+
+    <div *ngIf="tarifResume.length === 0"
+         style="text-align:center;padding:1.5rem;color:var(--muted)">
+      <span style="font-size:1.5rem;opacity:0.3">💰</span>
+      <p style="font-size:0.82rem;margin-top:6px">Chargement...</p>
+    </div>
+
+    <div class="tarif-mini-list">
+      <div class="tarif-mini-item" *ngFor="let t of tarifResume">
+        <div class="tarif-mini-left">
+          <div class="tarif-mini-name">{{ t.terrainNom }}</div>
+          <div class="tarif-mini-base">Base : {{ t.tarifBase }} DT/h</div>
+          <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
+            <span *ngIf="t.heurePointe"
+                  style="font-size:0.65rem;background:rgba(239,68,68,0.15);
+                         color:#ef4444;padding:1px 6px;border-radius:8px">
+              🔥 Pointe
+            </span>
+            <span *ngIf="t.weekend"
+                  style="font-size:0.65rem;background:rgba(245,158,11,0.15);
+                         color:#f59e0b;padding:1px 6px;border-radius:8px">
+              📅 WE
+            </span>
+            <span *ngIf="t.tauxOccupation > 70"
+                  style="font-size:0.65rem;background:rgba(239,68,68,0.15);
+                         color:#ef4444;padding:1px 6px;border-radius:8px">
+              📈 Demande
+            </span>
+            <span *ngIf="t.tauxOccupation < 30"
+                  style="font-size:0.65rem;background:rgba(34,197,94,0.15);
+                         color:#22c55e;padding:1px 6px;border-radius:8px">
+              🎁 Promo
+            </span>
+          </div>
+        </div>
+        <div class="tarif-mini-right">
+          <div class="tarif-mini-prix" [style.color]="t.couleur">
+            {{ t.tarifFinal }} DT/h
+          </div>
+          <span class="tarif-mini-badge"
+                [style.background]="t.couleur + '22'"
+                [style.color]="t.couleur"
+                [style.border]="'1px solid ' + t.couleur + '44'">
+            {{ getNiveauIcon(t.niveau) }} {{ getNiveauLabel(t.niveau) }}
+          </span>
+          <div *ngIf="t.supplement > 0"
+               style="font-size:0.7rem;color:var(--red);margin-top:2px">
+            ▲ +{{ t.supplement }} DT
+          </div>
+          <div *ngIf="t.economie > 0"
+               style="font-size:0.7rem;color:var(--green);margin-top:2px">
+            ▼ -{{ t.economie }} DT
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <a routerLink="/tarification" class="btn btn-primary"
+       style="width:100%;margin-top:1rem;justify-content:center;">
+      📊 Analyse complète des prix
+    </a>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="dash-grid">
+
+    <!-- COLONNE GAUCHE -->
+    <div class="left-col">
+
+      <!-- TERRAINS -->
+      <div class="sp-card">
+        <div class="section-header">
+          <div class="section-title">🏟️ Terrains</div>
+          <a routerLink="/terrains" class="btn btn-ghost"
+             style="font-size:0.78rem;padding:5px 12px;">Gérer →</a>
+        </div>
+        <div *ngIf="terrains.length === 0" class="empty-state">
+          <div class="empty-icon">🏟️</div>
+          <p>Aucun terrain enregistré</p>
+          <a routerLink="/terrains/nouveau" class="btn btn-primary"
+             style="margin-top:1rem;">➕ Ajouter</a>
+        </div>
+        <div class="terrain-mini-list">
+          <div class="terrain-mini" *ngFor="let t of terrains">
+            <div class="terrain-mini-icon">{{ getIcon(t.type) }}</div>
+            <div class="terrain-mini-info">
+              <div class="terrain-mini-name">{{ t.nom }}</div>
+              <div class="terrain-mini-type">
+                {{ t.type }} · {{ t.tarifHeure }} DT/h
+              </div>
+            </div>
+            <span class="badge" [ngClass]="getTerrainBadge(t.statut)">
+              {{ t.statut }}
+            </span>
+          </div>
+        </div>
+        <a routerLink="/terrains/nouveau" class="btn btn-primary"
+           style="width:100%;margin-top:1rem;justify-content:center;">
+          ➕ Nouveau Terrain
+        </a>
+      </div>
+
+      <!-- PLANNING DU JOUR INTERACTIF -->
+      <div class="sp-card planning-card">
+        <div class="section-header">
+          <div class="section-title">📆 Planning du Jour</div>
+          <div class="planning-nav">
+            <button class="nav-btn" (click)="changeDate(-1)">‹</button>
+            <span class="date-badge" (click)="resetToday()"
+                  title="Retour à aujourd'hui">
+              {{ selectedDate }}
+            </span>
+            <button class="nav-btn" (click)="changeDate(1)">›</button>
+          </div>
+        </div>
+
+        <!-- Sélecteur date -->
+        <div class="date-picker-row">
+          <input type="date"
+                 [value]="selectedDateISO"
+                 (change)="onDateChange($event)"
+                 class="date-input">
+          <button class="today-btn" (click)="resetToday()">
+            Aujourd'hui
+          </button>
+        </div>
+
+        <!-- En-tête heures -->
+        <div class="planning-table">
+          <div class="planning-header-row">
+            <div class="terrain-col-header">Terrain</div>
+            <div class="hour-col" *ngFor="let h of heures">
+              {{ h }}h
+              <div class="current-hour-dot"
+                   *ngIf="h === currentHour && isToday"></div>
+            </div>
+          </div>
+
+          <!-- Lignes terrains -->
+          <div class="planning-body">
+            <div class="planning-row-new"
+                 *ngFor="let t of terrains; let ti = index"
+                 [style.animation-delay]="ti * 0.05 + 's'">
+              <div class="terrain-col">
+                <span class="terrain-icon">{{ getIcon(t.type) }}</span>
+                <span class="terrain-short">
+                  {{ t.nom | slice:0:9 }}
+                </span>
+              </div>
+              <div class="slot-col"
+                   *ngFor="let h of heures"
+                   [ngClass]="getSlotClass(t.id, h)"
+                   (click)="onSlotClick(t, h)"
+                   [title]="getSlotTooltip(t.id, h)">
+
+                <ng-container *ngIf="getSlotData(t.id, h) as slot">
+                  <ng-container *ngIf="slot.occupied">
+                    <div *ngIf="slot.isStart" class="slot-start">
+                      <span class="slot-name">
+                        {{ slot.clientInitials }}
+                      </span>
+                      <span class="slot-time">{{ slot.heureDebut }}</span>
+                    </div>
+                    <div *ngIf="!slot.isStart" class="slot-continue">
+                      <span class="slot-bar">▬</span>
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="!slot.occupied">
+                    <span class="slot-free-text">libre</span>
+                  </ng-container>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Légende -->
+        <div class="planning-legend">
+          <span class="leg-item">
+            <span class="leg-dot busy"></span>Réservé
+          </span>
+          <span class="leg-item">
+            <span class="leg-dot free"></span>Libre
+          </span>
+          <span class="leg-item">
+            <span class="leg-dot maintenance"></span>Maintenance
+          </span>
+          <span class="leg-item" *ngIf="isToday">
+            <span class="leg-dot current"></span>Maintenant
+          </span>
+        </div>
+
+        <!-- Résumé du jour -->
+        <div class="planning-summary">
+          <div class="summary-item">
+            <span class="sum-icon">📅</span>
+            <span>{{ getTotalReservationsDay() }} réservation(s)</span>
+          </div>
+          <div class="summary-item">
+            <span class="sum-icon">✅</span>
+            <span>{{ getTotalFreeSlotsDay() }} créneaux libres</span>
+          </div>
+          <div class="summary-item">
+            <span class="sum-icon">💰</span>
+            <span>{{ getRevenuJour() | number:'1.0-0' }} DT</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COLONNE DROITE -->
+    <div class="right-col">
+
+      <!-- RESERVATIONS RECENTES -->
+      <div class="sp-card">
+        <div class="section-header">
+          <div class="section-title">📅 Réservations Récentes</div>
+          <a routerLink="/reservations" class="btn btn-ghost"
+             style="font-size:0.78rem;padding:5px 12px;">Voir tout →</a>
+        </div>
+        <div *ngIf="reservations.length === 0" class="empty-state">
+          <div class="empty-icon">📅</div>
+          <p>Aucune réservation reçue</p>
+        </div>
+        <div class="res-list">
+          <div class="res-item" *ngFor="let r of reservations">
+            <div class="res-avatar">{{ getInitials(r.clientNom) }}</div>
+            <div class="res-info">
+              <div class="res-name">{{ r.clientNom }}</div>
+              <div class="res-meta">
+                <span class="res-tag">{{ r.terrainNom }}</span>
+                <span class="res-tag">{{ r.dateReservation }}</span>
+                <span class="res-tag">
+                  {{ r.heureDebut }} → {{ r.heureFin }}
+                </span>
+              </div>
+            </div>
+            <div class="res-right">
+              <div class="res-amount">
+                {{ r.montantTotal | number:'1.0-0' }} DT
+              </div>
+              <span class="badge" [ngClass]="getBadgeClass(r.statut)">
+                {{ r.statut }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <a routerLink="/reservations" class="btn btn-primary"
+           style="width:100%;margin-top:1rem;justify-content:center;">
+          📋 Voir toutes les réservations
+        </a>
+      </div>
+
+      <!-- ÉTAT DES TERRAINS -->
+      <div class="sp-card">
+        <div class="section-header">
+          <div class="section-title">📊 État des Terrains</div>
+        </div>
+        <div class="statut-summary">
+          <div class="statut-item green">
+            <span class="statut-dot green"></span>
+            {{ terrainsDisponibles }} Disponible(s)
+          </div>
+          <div class="statut-item red">
+            <span class="statut-dot red"></span>
+            {{ terrainsOccupes }} Occupé(s)
+          </div>
+          <div class="statut-item amber">
+            <span class="statut-dot amber"></span>
+            {{ terrainsMaintenance }} Maintenance
+          </div>
+        </div>
+        <div class="stats-bars" *ngIf="terrains.length > 0">
+          <div class="stat-bar-item" *ngFor="let t of terrains">
+            <div class="stat-bar-header">
+              <span class="stat-bar-name">
+                {{ getIcon(t.type) }} {{ t.nom }}
+              </span>
+              <span class="badge" [ngClass]="getTerrainBadge(t.statut)"
+                    style="font-size:0.65rem;padding:2px 8px;">
+                {{ t.statut }}
+              </span>
+            </div>
+            <div class="stat-bar-track">
+              <div class="stat-bar-fill"
+                   [ngClass]="getBarColor(t.statut)"
+                   [style.width]="t.statut === 'OCCUPE'
+                     ? '100%' : t.statut === 'MAINTENANCE'
+                       ? '50%' : '25%'">
+              </div>
+            </div>
+            <div style="font-size:0.7rem;color:var(--muted);
+                        text-align:right;margin-top:2px">
+              {{ getOccupationTerrain(t.id) }}% occupation
+            </div>
+          </div>
+        </div>
+        <div *ngIf="terrains.length === 0" class="empty-state">
+          <div class="empty-icon">📊</div>
+          <p>Aucune donnée disponible</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

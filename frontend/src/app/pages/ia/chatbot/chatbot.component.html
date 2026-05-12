@@ -1,0 +1,146 @@
+<div class="chatbot-page">
+
+  <!-- NAVBAR -->
+  <nav class="user-nav">
+    <div class="logo">
+      <div class="logo-icon">⚽</div>
+      SmartPark
+    </div>
+    <div class="nav-links">
+      <a routerLink="/user/terrains"     routerLinkActive="active">🏟️ Terrains</a>
+      <a routerLink="/user/reservations" routerLinkActive="active">📅 Réservations</a>
+      <a routerLink="/chatbot"           routerLinkActive="active">🤖 Assistant IA</a>
+    </div>
+  </nav>
+
+  <div class="chatbot-layout">
+
+    <!-- SIDEBAR INFO -->
+    <div class="chat-sidebar">
+      <div class="bot-profile">
+        <div class="bot-avatar">🤖</div>
+        <div class="bot-name">Assistant SmartPark</div>
+        <div class="bot-status">
+          <span class="live-dot"></span> En ligne · IA Active
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">💡 Suggestions rapides</div>
+        <button *ngFor="let s of suggestionsRapides"
+                class="suggestion-chip"
+                (click)="utiliserSuggestion(s)">
+          {{ s }}
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-section-title">🧠 Modèles IA utilisés</div>
+        <div class="model-chip">
+          <span class="mc-dot green"></span>
+          DialoGPT — Conversation
+        </div>
+        <div class="model-chip">
+          <span class="mc-dot blue"></span>
+          BART — Classification
+        </div>
+        <div class="model-chip">
+          <span class="mc-dot amber"></span>
+          RoBERTa — Sentiment
+        </div>
+      </div>
+
+      <button class="btn-clear" (click)="effacerChat()">
+        🗑️ Effacer la conversation
+      </button>
+    </div>
+
+    <!-- CHAT PRINCIPAL -->
+    <div class="chat-main">
+
+      <!-- HEADER -->
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <div class="chat-bot-avatar">🤖</div>
+          <div>
+            <div class="chat-bot-name">Assistant SmartPark IA</div>
+            <div class="chat-bot-sub">
+              Powered by Hugging Face · Toujours disponible
+            </div>
+          </div>
+        </div>
+        <div class="chat-header-badge">
+          <span class="live-dot"></span> IA Active
+        </div>
+      </div>
+
+      <!-- MESSAGES -->
+      <div class="messages-container" #messagesContainer>
+        <div *ngFor="let msg of messages"
+             class="message-wrapper"
+             [class.user-wrapper]="msg.role === 'user'"
+             [class.bot-wrapper]="msg.role === 'assistant'">
+
+          <!-- Avatar bot -->
+          <div class="msg-avatar bot-msg-avatar"
+               *ngIf="msg.role === 'assistant'">
+            🤖
+          </div>
+
+          <!-- Bulle message -->
+          <div class="message-bubble"
+               [class.user-bubble]="msg.role === 'user'"
+               [class.bot-bubble]="msg.role === 'assistant'"
+               [class.loading-bubble]="msg.loading">
+
+            <!-- Loading animation -->
+            <div *ngIf="msg.loading" class="typing-dots">
+              <span></span><span></span><span></span>
+            </div>
+
+            <!-- Contenu -->
+            <div *ngIf="!msg.loading" class="msg-content">
+              {{ msg.content }}
+            </div>
+
+            <!-- Heure -->
+            <div class="msg-time" *ngIf="!msg.loading">
+              {{ formatTime(msg.timestamp) }}
+            </div>
+          </div>
+
+          <!-- Avatar user -->
+          <div class="msg-avatar user-msg-avatar"
+               *ngIf="msg.role === 'user'">
+            👤
+          </div>
+
+        </div>
+      </div>
+
+      <!-- INPUT -->
+      <div class="chat-input-area">
+        <div class="input-wrapper">
+          <textarea
+            class="chat-input"
+            [(ngModel)]="inputMessage"
+            (keydown)="onKeyPress($event)"
+            placeholder="Posez votre question... (Entrée pour envoyer)"
+            rows="1"
+            [disabled]="isLoading">
+          </textarea>
+          <button class="send-btn"
+                  (click)="envoyerMessage()"
+                  [disabled]="isLoading || !inputMessage.trim()">
+            <span *ngIf="!isLoading">➤</span>
+            <span *ngIf="isLoading" class="loading-spin">⏳</span>
+          </button>
+        </div>
+        <div class="input-hint">
+          Appuyez sur Entrée pour envoyer · Shift+Entrée pour saut de ligne
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

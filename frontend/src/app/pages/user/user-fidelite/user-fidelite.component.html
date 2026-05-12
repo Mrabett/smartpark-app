@@ -1,0 +1,772 @@
+<div class="user-page">
+
+  <div class="page-content">
+
+    <!-- HERO -->
+    <div class="fidelite-hero anim-fade-up">
+      <div class="fh-left">
+        <div class="fh-icon">🎖️</div>
+        <div>
+          <h1>Programme <span>Fidélité</span></h1>
+          <p>Jouez, gagnez des points et profitez
+             de réductions exclusives !</p>
+        </div>
+      </div>
+      <div *ngIf="profil" class="fh-niveau">
+        <div class="niveau-chip"
+             [style.borderColor]="
+               getNiveauCouleur(profil.niveau)">
+          <span class="niveau-icon">
+            {{ profil.niveauIcon }}
+          </span>
+          <span class="niveau-label"
+                [style.color]="
+                  getNiveauCouleur(profil.niveau)">
+            {{ profil.niveau }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGE -->
+    <div *ngIf="message" class="alert"
+         [class.alert-success]="messageType==='success'"
+         [class.alert-danger]="messageType==='error'"
+         style="margin-bottom:1rem">
+      {{ message }}
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="empty-state">
+      <div class="empty-icon">⏳</div>
+      <p>Chargement...</p>
+    </div>
+
+    <div *ngIf="!loading">
+
+      <!-- STATS RAPIDES -->
+      <div class="stats-grid anim-fade-up
+                  anim-delay-1">
+
+        <div class="stat-card green">
+          <div class="stat-header">
+            <span class="stat-label">Points</span>
+            <div class="stat-icon green">⭐</div>
+          </div>
+          <div class="stat-value green">
+            {{ profil?.pointsDisponibles || 0 }}
+          </div>
+          <div class="stat-sub">disponibles</div>
+        </div>
+
+        <div class="stat-card amber">
+          <div class="stat-header">
+            <span class="stat-label">Matchs joués</span>
+            <div class="stat-icon amber">⚽</div>
+          </div>
+          <div class="stat-value amber">
+            {{ profil?.matchsJoues || 0 }}
+          </div>
+          <div class="stat-sub">au total</div>
+        </div>
+
+        <div class="stat-card purple">
+          <div class="stat-header">
+            <span class="stat-label">Cartes</span>
+            <div class="stat-icon purple">🎟️</div>
+          </div>
+          <div class="stat-value purple">
+            {{ profil?.cartesCompletes || 0 }}
+          </div>
+          <div class="stat-sub">complétées</div>
+        </div>
+
+        <div class="stat-card green">
+          <div class="stat-header">
+            <span class="stat-label">Économies</span>
+            <div class="stat-icon green">💰</div>
+          </div>
+          <div class="stat-value green">
+            {{ profil?.economiesTotal | number:'1.0-0' }}
+          </div>
+          <div class="stat-sub">DT économisés</div>
+        </div>
+
+      </div>
+
+      <!-- ONGLETS -->
+      <div class="onglets-row"
+           style="margin-bottom:1.5rem">
+        <button class="btn-filtre"
+                [class.active]="onglet==='profil'"
+                (click)="onglet='profil'">
+          👤 Mon profil
+        </button>
+        <button class="btn-filtre"
+                [class.active]="onglet==='carte'"
+                (click)="onglet='carte'">
+          🎟️ Carte 10 matchs
+        </button>
+        <button class="btn-filtre"
+                [class.active]="onglet==='abonnements'"
+                (click)="onglet='abonnements'">
+          💎 Abonnements
+        </button>
+        <button class="btn-filtre"
+                [class.active]="onglet==='points'"
+                (click)="onglet='points'">
+          ⭐ Utiliser points
+        </button>
+        <button class="btn-filtre"
+                [class.active]="onglet==='leaderboard'"
+                (click)="onglet='leaderboard'">
+          🏆 Classement
+        </button>
+      </div>
+
+      <!-- ─── ONGLET PROFIL ─── -->
+      <div *ngIf="onglet === 'profil'
+               && profil"
+           class="anim-scale-up">
+
+        <div class="layout2">
+
+          <!-- Niveau & Progression -->
+          <div class="sp-card">
+            <div class="section-title"
+                 style="margin-bottom:1.25rem">
+              📈 Votre niveau
+            </div>
+
+            <div class="niveau-display">
+              <div class="nd-icon"
+                   [style.background]="
+                     getNiveauCouleur(profil.niveau)
+                     + '20'"
+                   [style.borderColor]="
+                     getNiveauCouleur(profil.niveau)
+                     + '50'">
+                {{ profil.niveauIcon }}
+              </div>
+              <div class="nd-info">
+                <div class="nd-nom"
+                     [style.color]="
+                       getNiveauCouleur(profil.niveau)">
+                  {{ profil.niveau }}
+                </div>
+                <div class="nd-pts">
+                  {{ profil.pointsTotal }} points
+                  au total
+                </div>
+              </div>
+            </div>
+
+            <!-- Barre progression -->
+            <div *ngIf="profil.niveau !== 'PLATINUM'">
+              <div class="prog-header">
+                <span style="font-size:0.78rem;
+                             color:var(--muted)">
+                  Progression vers le niveau suivant
+                </span>
+                <span style="font-size:0.78rem;
+                             font-weight:700;
+                             color:var(--green)">
+                  {{ profil.progressionNiveau }}%
+                </span>
+              </div>
+              <div class="prog-bar">
+                <div class="prog-fill"
+                     [style.width]="
+                       profil.progressionNiveau + '%'"
+                     [style.background]="
+                       getNiveauCouleur(profil.niveau)">
+                </div>
+              </div>
+              <p style="font-size:0.75rem;
+                        color:var(--muted);
+                        margin-top:6px">
+                Encore
+                <strong
+                  [style.color]="
+                    getNiveauCouleur(profil.niveau)">
+                  {{ profil.pointsProchainNiveau }}
+                  points
+                </strong>
+                pour le niveau suivant
+              </p>
+            </div>
+
+            <!-- Avantages du niveau -->
+            <div class="avantages-niveau">
+              <div class="av-title">
+                Vos avantages actuels :
+              </div>
+              <div class="av-item"
+                   *ngIf="profil.niveau === 'BRONZE'">
+                <span>🥉</span>
+                <span>Participez et gagnez des points
+                  à chaque match !</span>
+              </div>
+              <div class="av-item"
+                   *ngIf="profil.niveau !== 'BRONZE'">
+                <span>💰</span>
+                <span>
+                  Réduction automatique sur
+                  toutes vos réservations
+                </span>
+              </div>
+              <div class="av-item"
+                   *ngIf="profil.niveau === 'SILVER'">
+                <span>🥈</span>
+                <span>5% de réduction Silver</span>
+              </div>
+              <div class="av-item"
+                   *ngIf="profil.niveau === 'GOLD'">
+                <span>🥇</span>
+                <span>10% de réduction Gold</span>
+              </div>
+              <div class="av-item"
+                   *ngIf="profil.niveau === 'PLATINUM'">
+                <span>💎</span>
+                <span>15% de réduction Platinum</span>
+              </div>
+            </div>
+
+            <!-- Abonnement actif -->
+            <div *ngIf="profil.abonnementActif"
+                 class="abonnement-actif-chip">
+              <span>
+                {{ profil.abonnementActif.typeLabel }}
+              </span>
+              <span style="color:var(--muted);
+                           font-size:0.75rem">
+                Expire le
+                {{ profil.abonnementActif.dateFin }}
+              </span>
+              <span class="badge badge-green">Actif</span>
+            </div>
+
+          </div>
+
+          <!-- Historique points -->
+          <div class="sp-card">
+            <div class="section-title"
+                 style="margin-bottom:1.25rem">
+              📋 Historique des points
+            </div>
+
+            <div *ngIf="!profil.historique
+                     || profil.historique.length === 0"
+                 class="empty-state"
+                 style="padding:2rem 1rem">
+              <div class="empty-icon">⭐</div>
+              <p>Aucun historique pour l'instant.</p>
+            </div>
+
+            <div class="historique-liste">
+              <div class="histo-item"
+                   *ngFor="let h of
+                     profil.historique?.slice(0,15)">
+                <div class="hi-icon"
+                     [ngClass]="
+                       getPointsTypeClass(h.type)">
+                  {{ h.type === 'GAIN' ? '+'
+                     : h.type === 'UTILISE' ? '−'
+                     : '🎁' }}
+                </div>
+                <div class="hi-info">
+                  <div class="hi-desc">
+                    {{ h.description }}
+                  </div>
+                  <div class="hi-date">{{ h.date }}</div>
+                </div>
+                <div class="hi-pts"
+                     [ngClass]="
+                       getPointsTypeClass(h.type)">
+                  {{ h.points > 0 ? '+' : '' }}
+                  {{ h.points }} pts
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── CARTE 10 MATCHS ─── -->
+      <div *ngIf="onglet === 'carte' && profil"
+           class="sp-card anim-scale-up">
+
+        <div class="section-title"
+             style="margin-bottom:0.5rem">
+          🎟️ Carte de fidélité — 10 matchs
+        </div>
+        <p style="color:var(--muted);
+                  font-size:0.875rem;
+                  margin-bottom:1.5rem">
+          Complétez 10 matchs et recevez
+          +50 points bonus !
+        </p>
+
+        <div class="carte-slots">
+          <div *ngFor="let s of getCarteSlots();
+                       let i = index"
+               class="carte-slot"
+               [class.actif]="isSlotActif(i)"
+               [class.prochain]="
+                 i === profil.matchsCarteActuelle">
+            <div class="cs-inner">
+              <span *ngIf="isSlotActif(i)">⚽</span>
+              <span *ngIf="!isSlotActif(i)
+                        && i !==
+                          profil.matchsCarteActuelle">
+                {{ i + 1 }}
+              </span>
+              <span *ngIf="i ===
+                           profil.matchsCarteActuelle
+                        && !isSlotActif(i)">
+                ▶
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="carte-info">
+          <div class="ci-item">
+            <span class="ci-val green">
+              {{ profil.matchsCarteActuelle }}
+            </span>
+            <span class="ci-label">Matchs joués</span>
+          </div>
+          <div class="ci-sep"></div>
+          <div class="ci-item">
+            <span class="ci-val amber">
+              {{ profil.matchsRestantsCarte }}
+            </span>
+            <span class="ci-label">Restants</span>
+          </div>
+          <div class="ci-sep"></div>
+          <div class="ci-item">
+            <span class="ci-val purple">
+              {{ profil.cartesCompletes }}
+            </span>
+            <span class="ci-label">Cartes complètes</span>
+          </div>
+        </div>
+
+        <div *ngIf="profil.prochainMatchGratuit"
+             class="prochain-alerte">
+          <span>🔥</span>
+          <span>
+            <strong>Encore 1 match</strong>
+            et vous complétez votre carte !
+            +50 points bonus vous attendent !
+          </span>
+        </div>
+
+        <div class="recompenses-section">
+          <div class="section-title"
+               style="margin-bottom:1rem">
+            🎁 Récompenses des cartes
+          </div>
+          <div class="recompenses-grid">
+            <div class="rw-item">
+              <div class="rw-icon">🥉</div>
+              <div class="rw-info">
+                <div class="rw-titre">
+                  1ère carte complète
+                </div>
+                <div class="rw-desc">
+                  +50 points bonus
+                </div>
+              </div>
+              <span class="badge"
+                    [ngClass]="
+                      profil.cartesCompletes >= 1
+                      ? 'badge-green' : 'badge-amber'">
+                {{ profil.cartesCompletes >= 1
+                   ? '✅ Débloqué' : '🔒' }}
+              </span>
+            </div>
+            <div class="rw-item">
+              <div class="rw-icon">🥈</div>
+              <div class="rw-info">
+                <div class="rw-titre">
+                  3 cartes complètes
+                </div>
+                <div class="rw-desc">
+                  Niveau SILVER garanti
+                </div>
+              </div>
+              <span class="badge"
+                    [ngClass]="
+                      profil.cartesCompletes >= 3
+                      ? 'badge-green' : 'badge-amber'">
+                {{ profil.cartesCompletes >= 3
+                   ? '✅ Débloqué' : '🔒' }}
+              </span>
+            </div>
+            <div class="rw-item">
+              <div class="rw-icon">🥇</div>
+              <div class="rw-info">
+                <div class="rw-titre">
+                  5 cartes complètes
+                </div>
+                <div class="rw-desc">
+                  +200 points bonus spécial
+                </div>
+              </div>
+              <span class="badge"
+                    [ngClass]="
+                      profil.cartesCompletes >= 5
+                      ? 'badge-green' : 'badge-amber'">
+                {{ profil.cartesCompletes >= 5
+                   ? '✅ Débloqué' : '🔒' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─── ABONNEMENTS ─── -->
+      <div *ngIf="onglet === 'abonnements'"
+           class="anim-scale-up">
+
+        <div *ngIf="profil?.abonnementActif"
+             class="abonnement-current">
+          <div class="ac-icon">
+            {{ profil!.abonnementActif!.typeLabel }}
+          </div>
+          <div class="ac-info">
+            <div class="ac-titre">
+              Abonnement actif
+            </div>
+            <div class="ac-desc">
+              {{ profil!.abonnementActif!.matchsRestants }}
+              matchs restants ·
+              Expire le
+              {{ profil!.abonnementActif!.dateFin }}
+            </div>
+          </div>
+          <span class="badge badge-green">
+            ✅ Actif
+          </span>
+        </div>
+
+        <div class="abonnements-grid">
+          <div *ngFor="let ab of abonnements"
+               class="abonnement-card"
+               [style.borderColor]="ab.couleur + '40'"
+               [class.actif-ab]="
+                 profil?.abonnementActif?.type
+                 === ab.type">
+
+            <!-- Header -->
+            <div class="ab-header"
+                 [style.background]="
+                   ab.couleur + '15'">
+              <div class="ab-prix">
+                <span class="ab-montant">
+                  {{ ab.prix }}
+                </span>
+                <span class="ab-devise">DT/mois</span>
+              </div>
+              <div class="ab-type-label"
+                   [style.color]="ab.couleur">
+                {{ ab.label }}
+              </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="ab-stats">
+              <div class="abs-item">
+                <span class="abs-val"
+                      [style.color]="ab.couleur">
+                  {{ ab.matchs }}
+                </span>
+                <span class="abs-label">Matchs/mois</span>
+              </div>
+              <div class="abs-sep"></div>
+              <div class="abs-item">
+                <span class="abs-val"
+                      [style.color]="ab.couleur">
+                  {{ ab.reduc }}%
+                </span>
+                <span class="abs-label">Réduction</span>
+              </div>
+              <div class="abs-sep"></div>
+              <div class="abs-item">
+                <span class="abs-val"
+                      [style.color]="ab.couleur">
+                  +{{ ab.points }}
+                </span>
+                <span class="abs-label">Points/mois</span>
+              </div>
+            </div>
+
+            <!-- Avantages -->
+            <div class="ab-avantages">
+              <div class="ava-item"
+                   *ngFor="let a of ab.avantages">
+                <span style="color:var(--green)">✓</span>
+                <span>{{ a }}</span>
+              </div>
+            </div>
+
+            <!-- Bouton -->
+            <button class="btn-ab"
+                    [style.background]="
+                      ab.couleur + '20'"
+                    [style.borderColor]="
+                      ab.couleur + '50'"
+                    [style.color]="ab.couleur"
+                    [disabled]="
+                      profil?.abonnementActif?.type
+                      === ab.type"
+                    (click)="souscrire(ab.type)">
+              {{ profil?.abonnementActif?.type
+                 === ab.type
+                 ? '✅ Abonnement actif'
+                 : '🚀 Souscrire' }}
+            </button>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─── UTILISER POINTS ─── -->
+      <div *ngIf="onglet === 'points' && profil"
+           class="layout2 anim-scale-up">
+
+        <div class="sp-card">
+          <div class="section-title"
+               style="margin-bottom:1.25rem">
+            ⭐ Utiliser mes points
+          </div>
+
+          <div class="points-dispo-banner">
+            <span class="pdb-icon">⭐</span>
+            <div>
+              <div class="pdb-val">
+                {{ profil.pointsDisponibles }}
+              </div>
+              <div class="pdb-label">
+                points disponibles
+              </div>
+            </div>
+            <div>
+              <div class="pdb-val green">
+                {{ (profil.pointsDisponibles * 0.1)
+                   | number:'1.1-1' }} DT
+              </div>
+              <div class="pdb-label">
+                valeur totale
+              </div>
+            </div>
+          </div>
+
+          <div class="sp-field"
+               style="margin-bottom:1rem">
+            <label class="form-label">
+              💰 Montant de la réservation (DT)
+            </label>
+            <input type="number"
+                   class="form-input"
+                   [(ngModel)]="montantSimulation"
+                   min="0" max="500"
+                   (change)="simulerReduction()">
+          </div>
+
+          <div class="sp-field"
+               style="margin-bottom:1.5rem">
+            <label class="form-label">
+              ⭐ Points à utiliser
+              (max {{ profil.pointsDisponibles }})
+            </label>
+            <input type="number"
+                   class="form-input"
+                   [(ngModel)]="pointsAUtiliser"
+                   min="0"
+                   [max]="profil.pointsDisponibles"
+                   (change)="simulerReduction()">
+            <p style="font-size:0.72rem;
+                      color:var(--muted);
+                      margin-top:4px">
+              1 point = 0.1 DT de réduction
+            </p>
+          </div>
+
+          <div *ngIf="simulationResult"
+               class="simulation-result">
+            <div class="sr-row">
+              <span>Montant original</span>
+              <span>
+                {{ simulationResult.montantOriginal
+                   || montantSimulation }} DT
+              </span>
+            </div>
+            <div class="sr-row green">
+              <span>Réduction niveau</span>
+              <span>
+                -{{ simulationResult.reduction
+                   | number:'1.1-1' }} DT
+              </span>
+            </div>
+            <div class="sr-row total">
+              <span>Montant final</span>
+              <strong>
+                {{ simulationResult.montantFinal
+                   | number:'1.1-1' }} DT
+              </strong>
+            </div>
+          </div>
+
+          <button class="btn btn-primary"
+                  style="width:100%;margin-top:1rem"
+                  (click)="simulerReduction()">
+            🔍 Calculer la réduction
+          </button>
+
+          <button *ngIf="pointsAUtiliser > 0"
+                  class="btn btn-secondary"
+                  style="width:100%;margin-top:8px"
+                  (click)="utiliserPoints()">
+            ⭐ Utiliser
+            {{ pointsAUtiliser }} points
+          </button>
+
+        </div>
+
+        <!-- Règles des points -->
+        <div class="sp-card">
+          <div class="section-title"
+               style="margin-bottom:1.25rem">
+            📖 Comment gagner des points ?
+          </div>
+          <div class="regles-liste">
+            <div class="rg-item">
+              <div class="rg-icon green">⚽</div>
+              <div class="rg-info">
+                <div class="rg-titre">
+                  Jouer un match
+                </div>
+                <div class="rg-pts">+10 points</div>
+              </div>
+            </div>
+            <div class="rg-item">
+              <div class="rg-icon blue">🏟️</div>
+              <div class="rg-info">
+                <div class="rg-titre">
+                  Réserver un terrain
+                </div>
+                <div class="rg-pts">
+                  +5 pts + 1pt/10DT
+                </div>
+              </div>
+            </div>
+            <div class="rg-item">
+              <div class="rg-icon amber">🎟️</div>
+              <div class="rg-info">
+                <div class="rg-titre">
+                  Compléter une carte 10 matchs
+                </div>
+                <div class="rg-pts">+50 points bonus</div>
+              </div>
+            </div>
+            <div class="rg-item">
+              <div class="rg-icon purple">💎</div>
+              <div class="rg-info">
+                <div class="rg-titre">
+                  Souscrire un abonnement
+                </div>
+                <div class="rg-pts">
+                  +20 à +100 points
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="conversion-box">
+            <div class="cb-titre">
+              ⭐ Valeur des points
+            </div>
+            <div class="cb-rule">
+              <span>100 points</span>
+              <span>→</span>
+              <strong style="color:var(--green)">
+                10 DT de réduction
+              </strong>
+            </div>
+            <div class="cb-rule">
+              <span>1 point</span>
+              <span>=</span>
+              <strong style="color:var(--green)">
+                0.1 DT
+              </strong>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ─── LEADERBOARD ─── -->
+      <div *ngIf="onglet === 'leaderboard'"
+           class="sp-card anim-scale-up">
+
+        <div class="section-title"
+             style="margin-bottom:1.5rem">
+          🏆 Classement des joueurs
+        </div>
+
+        <div *ngIf="leaderboard.length === 0"
+             class="empty-state"
+             style="padding:2rem 1rem">
+          <div class="empty-icon">🏆</div>
+          <p>Aucun classement disponible.</p>
+        </div>
+
+        <div class="leaderboard-liste">
+          <div *ngFor="let entry of leaderboard;
+                       let i = index"
+               class="lb-item"
+               [class.top3]="i < 3">
+
+            <div class="lb-rank">
+              <span *ngIf="i === 0">🥇</span>
+              <span *ngIf="i === 1">🥈</span>
+              <span *ngIf="i === 2">🥉</span>
+              <span *ngIf="i > 2"
+                    style="color:var(--muted)">
+                {{ i + 1 }}
+              </span>
+            </div>
+
+            <div class="lb-avatar">
+              {{ entry.nom?.[0]?.toUpperCase() }}
+            </div>
+
+            <div class="lb-info">
+              <div class="lb-nom">{{ entry.nom }}</div>
+              <div class="lb-details">
+                {{ entry.matchs }} matchs ·
+                {{ entry.icon }} {{ entry.niveau }}
+              </div>
+            </div>
+
+            <div class="lb-pts">
+              <span class="lb-pts-val">
+                {{ entry.points }}
+              </span>
+              <span class="lb-pts-label">pts</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>

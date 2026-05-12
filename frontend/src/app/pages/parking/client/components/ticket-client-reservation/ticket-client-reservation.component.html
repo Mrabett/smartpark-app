@@ -1,0 +1,160 @@
+<div class="ticket-container">
+
+  <div *ngIf="loading" class="status-box">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Génération de votre ticket...</p>
+  </div>
+
+  <div *ngIf="error" class="status-box">
+    <mat-icon color="warn" style="font-size: 60px; width: 60px; height: 60px;">error_outline</mat-icon>
+    <h2>Ticket introuvable</h2>
+    <p>Ce lien semble expiré ou invalide.</p>
+    <button mat-flat-button color="primary" (click)="goBack()">Retour</button>
+  </div>
+
+  <div *ngIf="res && !loading" class="ticket-card">
+
+    <div class="ticket-header">
+      <mat-icon>check_circle</mat-icon>
+      <h1>Réservation Confirmée</h1>
+    </div>
+
+    <div [style.backgroundColor]="ticketStatusColor"
+      style="color: white; text-align: center; padding: 12px; font-weight: bold; font-size: 1.2em; border-bottom: 2px dashed rgba(255,255,255,0.4);">
+      {{ ticketStatusMessage }}
+    </div>
+
+    <div class="ticket-body" id="ticket-content">
+      <div class="info-row">
+        <span>Client</span>
+        <strong>{{ res.userName || 'N/A' }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Matricule</span>
+        <strong>{{ res.matricule | uppercase }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Place</span>
+        <strong>{{ res.spotNom || 'Standard' }}</strong>
+      </div>
+
+      <hr class="dashed-line">
+
+      <div class="time-section">
+        <div class="time-block">
+          <label>Arrivée prévue</label>
+          <p>{{ res.datetimeEntree | date:'dd MMM yyyy' }}</p>
+          <span>{{ res.datetimeEntree | date:'HH:mm' }}</span>
+        </div>
+        <mat-icon>arrow_forward</mat-icon>
+        <div class="time-block">
+          <label>Départ prévu</label>
+          <p>{{ res.datetimeSortie | date:'dd MMM yyyy' }}</p>
+          <span>{{ res.datetimeSortie | date:'HH:mm' }}</span>
+        </div>
+      </div>
+
+      <div class="price-box">
+        <span>{{ res.spontane ? 'Montant cumulé' : 'Montant de la réservation' }}</span>
+        <h2>{{ (res.spontane ? montantFinal : res.montant) | number:'1.2-2' }} TND</h2>
+      </div>
+    </div>
+
+    <div class="qr-employe-box" style="text-align: center; margin-top: 20px;">
+      <qrcode [qrdata]="getTicketUrl(res.id)" [width]="150" [errorCorrectionLevel]="'M'"></qrcode>
+      <p style="font-size: 0.8em; color: gray; margin-top: 5px;">
+        À présenter à l'agent de parking
+      </p>
+    </div>
+
+    <div class="employee-pricing-section">
+      <div class="emp-section-title">
+        <mat-icon>payments</mat-icon>
+        <span>Ajustement en temps réel</span>
+      </div>
+
+      <div *ngIf="calculEnCours" class="emp-loading">
+        <mat-spinner diameter="24"></mat-spinner>
+        <span>Calcul en cours…</span>
+      </div>
+
+      <div *ngIf="!calculEnCours">
+        <div class="emp-status-badge" [ngClass]="{
+               'badge-ok': statutPassage === 'normal',
+               'badge-retard': statutPassage === 'sortie-tardive',
+               'badge-remise': statutPassage === 'arrivee-tardive'
+             }">
+          <mat-icon>
+            {{ statutPassage === 'normal' ? 'check_circle' :
+            statutPassage === 'sortie-tardive' ? 'schedule' : 'discount' }}
+          </mat-icon>
+          <span *ngIf="statutPassage === 'normal'">Respect des délais</span>
+          <span *ngIf="statutPassage === 'sortie-tardive'">Retard Sortie : {{ retardSortieMinutes }} min</span>
+          <span *ngIf="statutPassage === 'arrivee-tardive'">Retard Arrivée : {{ retardArriveeMinutes }} min</span>
+        </div>
+
+        <div class="price-detail">
+          <div class="price-detail-line">
+            <span>Prix de base</span>
+            <span>{{ montantBase | number:'1.2-2' }} TND</span>
+          </div>
+
+          <div class="price-detail-line surcharge" *ngIf="fraisSortieTardive > 0">
+            <span>
+              <mat-icon style="font-size:14px;width:14px;height:14px;vertical-align:middle;">add_circle</mat-icon>
+              Supplément Retard
+            </span>
+            <span>+ {{ fraisSortieTardive | number:'1.2-2' }} TND</span>
+          </div>
+
+          <div class="price-detail-line discount" *ngIf="remiseArriveeTardive > 0">
+            <span>
+              <mat-icon style="font-size:14px;width:14px;height:14px;vertical-align:middle;">remove_circle</mat-icon>
+              Remise Retard Arrivée
+            </span>
+            <span>- {{ remiseArriveeTardive | number:'1.2-2' }} TND</span>
+          </div>
+        </div>
+
+        <div class="emp-total" [ngClass]="{
+               'emp-total-ok': statutPassage === 'normal',
+               'emp-total-red': statutPassage === 'sortie-tardive',
+               'emp-total-blue': statutPassage === 'arrivee-tardive'
+             }">
+          <span class="emp-total-label">TOTAL À PAYER</span>
+          <span class="emp-total-amount">{{ montantFinal | number:'1.2-2' }} TND</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin: 15px; padding: 12px; border: 1px dashed #ffa000; background: #fff9c4; border-radius: 8px;">
+      <h4 style="margin: 0 0 8px 0; color: #f57c00; display: flex; align-items: center; font-size: 0.95em;">
+        <mat-icon style="margin-right: 5px; font-size: 20px; width: 20px; height: 20px;">info</mat-icon>
+        RAPPEL DES TARIFS
+      </h4>
+      <ul style="margin: 0; padding-left: 18px; font-size: 0.85rem; color: #333; line-height: 1.4;">
+        <li style="margin-bottom: 5px;">
+          <strong>Arrivée tardive :</strong> Remise de
+          <span style="color: #2e7d32; font-weight: bold;">{{ res.remiseRetard }} TND/H</span> (si > 1h).
+        </li>
+        <li>
+          <strong>Sortie tardive :</strong> Majoration de
+          <span style="color: #c62828; font-weight: bold;">{{ res.tarifDepassement }} TND/H</span>.
+        </li>
+      </ul>
+    </div>
+
+    <div class="ticket-actions">
+      <button mat-raised-button color="primary" class="full-width" (click)="downloadAsPDF()">
+        <mat-icon>picture_as_pdf</mat-icon> Télécharger le PDF
+      </button>
+
+      <button mat-stroked-button class="full-width" (click)="goBack()" style="margin-top: 10px;">
+        <mat-icon>close</mat-icon> Fermer
+      </button>
+    </div>
+
+  </div>
+</div>

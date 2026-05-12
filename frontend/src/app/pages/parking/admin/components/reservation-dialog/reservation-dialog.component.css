@@ -1,0 +1,60 @@
+.pro-dialog-content {
+  padding-top: 15px;
+  min-width: 400px;
+}
+
+.pro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.time-row {
+  display: flex;
+  gap: 15px;
+}
+
+.time-row mat-form-field {
+  flex: 1;
+  /* Les deux champs d'heures prennent 50% de la largeur chacun */
+}
+
+/* 🔴 La classe magique pour mettre le jour en rouge dans le datepicker */
+::ng-deep .date-reservee .mat-calendar-body-cell-content {
+  background-color: #ffebee !important;
+  color: #d32f2f !important;
+  border: 1px solid #ef5350 !important;
+}
+
+/* ⚠️ Bannière d'alerte professionnelle */
+.alert-banner {
+  display: flex;
+  align-items: center;
+  background-color: #fff3e0;
+  /* Orange très clair */
+  border-left: 4px solid #ff9800;
+  /* Bordure orange */
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  color: #e65100;
+}
+
+.alert-icon {
+  margin-right: 10px;
+}
+
+.alert-text {
+  font-size: 0.9rem;
+}
+
+.error-msg {
+  color: #d32f2f;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+}

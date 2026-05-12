@@ -1,0 +1,38 @@
+# Node
+node_modules/
+dist/
+.angular/
+
+# Java
+target/
+*.jar
+*.war
+
+# Docker
+.dockerignore
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+*.env
+.env.local
+# Maven local repository
+.m2/
+backend/.m2/
+
+# Node
+node_modules/
+dist/
+.angular/
+
+# Java
+target/
+*.jar
+*.war

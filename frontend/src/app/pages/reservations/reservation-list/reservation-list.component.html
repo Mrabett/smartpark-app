@@ -1,0 +1,152 @@
+<div class="page-content">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div>
+      <h1>📅 Réservations <span>Reçues</span></h1>
+      <p>
+        {{ reservations.length }} réservation(s) ·
+        Revenus : <span style="color:var(--green);font-weight:700;">
+          {{ getTotalRevenus() }} DT
+        </span>
+      </p>
+    </div>
+  </div>
+
+  <div *ngIf="message" class="alert-msg">{{ message }}</div>
+
+  <!-- STATS -->
+  <div class="res-stats">
+    <div class="res-stat">
+      <div class="res-stat-icon">📋</div>
+      <div class="res-stat-val">{{ reservations.length }}</div>
+      <div class="res-stat-label">Total reçues</div>
+    </div>
+    <div class="res-stat green">
+      <div class="res-stat-icon">✅</div>
+      <div class="res-stat-val green">
+        {{ getCount('CONFIRMEE') }}
+      </div>
+      <div class="res-stat-label">Confirmées</div>
+    </div>
+    <div class="res-stat amber">
+      <div class="res-stat-icon">⏳</div>
+      <div class="res-stat-val amber">
+        {{ getCount('EN_ATTENTE') }}
+      </div>
+      <div class="res-stat-label">En attente</div>
+    </div>
+    <div class="res-stat red">
+      <div class="res-stat-icon">❌</div>
+      <div class="res-stat-val red">
+        {{ getCount('ANNULEE') }}
+      </div>
+      <div class="res-stat-label">Annulées</div>
+    </div>
+    <div class="res-stat purple">
+      <div class="res-stat-icon">💰</div>
+      <div class="res-stat-val purple">{{ getTotalRevenus() }} DT</div>
+      <div class="res-stat-label">Revenus confirmés</div>
+    </div>
+  </div>
+
+  <!-- FILTRES -->
+  <div class="filtres">
+    <button *ngFor="let f of filtres"
+            class="tab" [class.active]="filtreActif === f.value"
+            (click)="filtrer(f.value)">
+      {{ f.label }}
+    </button>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrapper" *ngIf="reservationsFiltrees.length > 0">
+    <table class="res-table">
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Terrain</th>
+          <th>Date</th>
+          <th>Horaire</th>
+          <th>Montant</th>
+          <th>Statut</th>
+          <th>Actions Admin</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of reservationsFiltrees; let i = index"
+            [style.animation-delay]="(i * 0.05) + 's'">
+
+          <!-- CLIENT -->
+          <td>
+            <div class="client-cell">
+              <div class="res-avatar">{{ getInitials(r.clientNom) }}</div>
+              <div>
+                <div class="client-name">{{ r.clientNom }}</div>
+                <div class="client-email">{{ r.clientEmail }}</div>
+                <div class="client-tel">📞 {{ r.clientTel }}</div>
+              </div>
+            </div>
+          </td>
+
+          <!-- TERRAIN -->
+          <td>
+            <span class="terrain-chip">{{ r.terrainNom }}</span>
+          </td>
+
+          <!-- DATE -->
+          <td class="date-cell">{{ r.dateReservation }}</td>
+
+          <!-- HORAIRE -->
+          <td class="time-cell">
+            {{ r.heureDebut }} → {{ r.heureFin }}
+          </td>
+
+          <!-- MONTANT -->
+          <td>
+            <span class="amount">{{ r.montantTotal }} DT</span>
+          </td>
+
+          <!-- STATUT -->
+          <td>
+            <span class="badge" [ngClass]="getBadgeClass(r.statut)">
+              {{ r.statut }}
+            </span>
+          </td>
+
+          <!-- ACTIONS ADMIN -->
+          <td>
+            <div class="action-btns">
+              <!-- Confirmer si en attente -->
+              <button *ngIf="r.statut === 'EN_ATTENTE'"
+                      (click)="confirmer(r.id!)"
+                      class="btn-sm btn-confirm">
+                ✅ Confirmer
+              </button>
+              <!-- Annuler si confirmée -->
+              <button *ngIf="r.statut === 'CONFIRMEE'"
+                      (click)="annuler(r.id!)"
+                      class="btn-sm btn-edit">
+                ✕ Annuler
+              </button>
+              <!-- Supprimer -->
+              <button (click)="delete(r.id!)"
+                      class="btn-sm btn-delete">
+                🗑️
+              </button>
+            </div>
+          </td>
+
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- EMPTY -->
+  <div *ngIf="reservationsFiltrees.length === 0" class="empty-state">
+    <div class="empty-icon">📅</div>
+    <h3>Aucune réservation reçue</h3>
+    <p>Les réservations faites par les clients apparaîtront ici</p>
+  </div>
+
+</div>

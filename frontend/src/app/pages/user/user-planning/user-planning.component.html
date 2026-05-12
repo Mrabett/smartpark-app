@@ -1,0 +1,278 @@
+<div class="planning-page">
+  <div class="page-content">
+
+    <!-- HERO -->
+    <div class="planning-hero">
+      <div class="hero-left">
+        <h1>Planning <span>des Terrains</span></h1>
+        <p>Visualisez les disponibilités en temps réel · cliquez sur un créneau vert pour réserver</p>
+      </div>
+      <div class="hero-controls">
+        <div class="date-nav">
+          <button class="date-nav-btn" (click)="changerJour(-1)">&#8249;</button>
+          <div class="date-display">
+            <div class="date-label">{{ getJourLabel() }}</div>
+            <input type="date" class="date-input-hidden"
+                   [(ngModel)]="dateSelectionnee"
+                   (ngModelChange)="onDateChange()"
+                   #dateInput>
+            <button class="date-btn" (click)="dateInput.click()">
+              📅 {{ formatDate(dateSelectionnee) }}
+            </button>
+          </div>
+          <button class="date-nav-btn" (click)="changerJour(1)">&#8250;</button>
+        </div>
+        <div class="terrain-filter">
+          <button class="filter-btn"
+                  [class.active]="terrainFiltre === 'TOUS'"
+                  (click)="filtrerTerrain('TOUS')">Tous</button>
+          <button class="filter-btn"
+                  *ngFor="let t of terrains"
+                  [class.active]="terrainFiltre === t.id"
+                  (click)="filtrerTerrain(t.id)">
+            {{ getIcon(t.type) }} {{ t.nom }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LÉGENDE -->
+    <div class="legende">
+      <div class="leg-item"><div class="leg-dot libre"></div><span>Libre — cliquez pour réserver</span></div>
+      <div class="leg-item"><div class="leg-dot occupe"></div><span>Réservé par un client</span></div>
+      <div class="leg-item"><div class="leg-dot maintenance"></div><span>Maintenance</span></div>
+      <div class="leg-item"><div class="leg-dot passe"></div><span>Heure passée</span></div>
+      <div class="leg-item"><div class="leg-dot selection"></div><span>Votre sélection</span></div>
+    </div>
+
+    <!-- PLANNING -->
+    <div class="planning-container" *ngIf="!loading">
+
+      <!-- HEADER HEURES -->
+      <div class="planning-grid-header">
+        <div class="terrain-label-header">Terrain</div>
+        <div class="heures-header">
+          <div class="heure-col" *ngFor="let h of heures">
+            <span [class.heure-active]="isAujourdhui() && h === heureActuelle">{{ h }}h</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIGNES TERRAINS -->
+      <div class="planning-rows">
+        <div class="planning-row"
+             *ngFor="let terrain of terrainsFiltres; let ti = index"
+             [style.animation-delay]="(ti * 0.06) + 's'">
+
+          <!-- INFO TERRAIN -->
+          <div class="terrain-info">
+            <div class="terrain-icon-badge" [ngClass]="getBgClass(terrain.type)">
+              {{ getIcon(terrain.type) }}
+            </div>
+            <div class="terrain-details">
+              <div class="terrain-name">{{ terrain.nom }}</div>
+              <div class="terrain-meta">{{ terrain.type }} · {{ terrain.tarifHeure }} DT/h</div>
+              <div class="terrain-statut-badge" [ngClass]="getStatutClass(terrain.statut)">
+                {{ terrain.statut }}
+              </div>
+            </div>
+          </div>
+
+          <!-- CRÉNEAUX -->
+          <div class="creneaux-wrapper">
+
+            <div class="creneaux-row">
+              <div *ngFor="let h of heures"
+                   class="creneau"
+                   [ngClass]="getCreneauClass(terrain.id, h)"
+                   [title]="getCreneauTooltip(terrain.id, h)"
+                   (click)="onCreneauClick(terrain, h)"
+                   (mouseenter)="hoveredCreneau = { terrainId: terrain.id, heure: h }"
+                   (mouseleave)="hoveredCreneau = null">
+
+                <div class="creneau-content">
+                  <ng-container *ngIf="getReservationDuCreneau(terrain.id, h) as res">
+                    <span class="creneau-initiales">{{ getInitiales(res.clientNom) }}</span>
+                  </ng-container>
+                  <span *ngIf="terrain.statut === 'MAINTENANCE'" class="creneau-icon">⚙</span>
+                  <span *ngIf="isSelectionne(terrain.id, h)" class="creneau-check">✓</span>
+                </div>
+
+                <!-- Tooltip -->
+                <div class="creneau-tooltip"
+                     *ngIf="hoveredCreneau?.terrainId === terrain.id && hoveredCreneau?.heure === h">
+                  <ng-container *ngIf="getReservationDuCreneau(terrain.id, h) as res; else tooltipLibre">
+                    <div class="tooltip-title red">🔴 Créneau réservé</div>
+                    <div class="tooltip-info">👤 {{ res.clientNom }}</div>
+                    <div class="tooltip-info">🕐 {{ res.heureDebut }} → {{ res.heureFin }}</div>
+                    <div class="tooltip-info" *ngIf="res.clientTel">📞 {{ res.clientTel }}</div>
+                    <div class="tooltip-info" *ngIf="res.montantTotal">💰 {{ res.montantTotal }} DT</div>
+                  </ng-container>
+                  <ng-template #tooltipLibre>
+                    <div *ngIf="terrain.statut !== 'MAINTENANCE' && !(isAujourdhui() && h < heureActuelle)">
+                      <div class="tooltip-title green">✅ Créneau libre</div>
+                      <div class="tooltip-action">Cliquez pour réserver {{ h }}h00</div>
+                      <div class="tooltip-price">{{ terrain.tarifHeure }} DT/h</div>
+                    </div>
+                    <div *ngIf="isAujourdhui() && h < heureActuelle">
+                      <div class="tooltip-title muted">⏱ Heure passée</div>
+                    </div>
+                  </ng-template>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- BARRES DE RÉSERVATION -->
+            <div class="reservations-overlay">
+              <div *ngFor="let res of getReservationsDuTerrain(terrain.id)"
+                   class="res-bar"
+                   [style.left.px]="getBarLeftPx(res)"
+                   [style.width.px]="getBarWidthPx(res)"
+                   [title]="res.clientNom + ' · ' + res.heureDebut + ' → ' + res.heureFin">
+                <div class="res-bar-inner">
+                  <span class="res-bar-avatar">{{ getInitiales(res.clientNom) }}</span>
+                  <span class="res-bar-text">
+                    <strong>{{ res.clientNom }}</strong>
+                    &nbsp;·&nbsp;{{ res.heureDebut }}→{{ res.heureFin }}
+                  </span>
+                  <span class="res-bar-statut" [ngClass]="getBadgeClass(res.statut)">
+                    {{ res.statut }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- LIGNE HEURE ACTUELLE PAR ROW -->
+            <div class="ha-row-line"
+                 *ngIf="isAujourdhui()"
+                 [style.left.px]="getPositionHeureActuelle()">
+              <div class="ha-row-dot"></div>
+              <div class="ha-row-bar"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- LABEL HEURE ACTUELLE (flottant au-dessus du header) -->
+      <div class="ha-global-label"
+           *ngIf="isAujourdhui()"
+           [style.left.px]="getPositionHeureActuelleGlobal()">
+        {{ heureActuelle }}h{{ getMinutesFormatted() }}
+      </div>
+
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="loading-spinner-big"></div>
+      <p>Chargement du planning...</p>
+    </div>
+
+    <!-- ===== MODAL ===== -->
+    <div class="modal-overlay" *ngIf="showModal" (click)="fermerModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+
+        <div class="modal-header">
+          <div class="modal-terrain-info">
+            <div class="modal-terrain-icon" [ngClass]="getBgClass(terrainSelectionne?.type || '')">
+              {{ getIcon(terrainSelectionne?.type || '') }}
+            </div>
+            <div>
+              <h3>{{ terrainSelectionne?.nom }}</h3>
+              <p>{{ terrainSelectionne?.type }} · {{ terrainSelectionne?.tarifHeure }} DT/h</p>
+            </div>
+          </div>
+          <button class="modal-close" (click)="fermerModal()">&#x2715;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="time-selection">
+            <div class="time-label">🕐 Choisissez votre créneau</div>
+            <div class="time-range">
+              <div class="time-picker">
+                <label>Début</label>
+                <select class="form-select"
+                        [(ngModel)]="heureDebutModal"
+                        (ngModelChange)="recalculerMontant()">
+                  <option *ngFor="let h of heuresDisponibles"
+                          [value]="h + ':00'"
+                          [disabled]="!isHeureDisponible(terrainSelectionne?.id, h)">
+                    {{ h }}h00{{ !isHeureDisponible(terrainSelectionne?.id, h) ? ' (occupé)' : '' }}
+                  </option>
+                </select>
+              </div>
+              <div class="time-arrow">&#8594;</div>
+              <div class="time-picker">
+                <label>Fin</label>
+                <select class="form-select"
+                        [(ngModel)]="heureFinModal"
+                        (ngModelChange)="recalculerMontant()">
+                  <option *ngFor="let h of heuresDisponibles"
+                          [value]="h + ':00'"
+                          [disabled]="h <= getHeureDebutNum()">
+                    {{ h }}h00
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="montant-box" *ngIf="montantEstime > 0">
+              <span>💰 Montant estimé</span>
+              <span class="montant-val">{{ montantEstime }} DT</span>
+            </div>
+          </div>
+
+          <div class="alert-error" *ngIf="conflitHoraire">
+            ⚠️ Conflit — un créneau de cette plage est déjà réservé
+          </div>
+
+          <div class="client-form">
+            <div class="form-row-modal">
+              <div class="sp-field">
+                <label class="form-label">👤 Nom complet *</label>
+                <input class="form-input"
+                       [(ngModel)]="nouvelleRes.clientNom"
+                       placeholder="Ahmed Ben Ali">
+              </div>
+              <div class="sp-field">
+                <label class="form-label">📞 Téléphone *</label>
+                <input class="form-input"
+                       [(ngModel)]="nouvelleRes.clientTel"
+                       placeholder="55 123 456">
+              </div>
+            </div>
+            <div class="sp-field">
+              <label class="form-label">✉️ Email *</label>
+              <input type="email" class="form-input"
+                     [(ngModel)]="nouvelleRes.clientEmail"
+                     placeholder="ahmed@email.com">
+            </div>
+          </div>
+
+          <div class="alert-error" *ngIf="erreurReservation">⚠️ {{ erreurReservation }}</div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-primary"
+                  (click)="confirmerReservation()"
+                  [disabled]="loadingReservation || conflitHoraire">
+            {{ loadingReservation ? '⏳ Confirmation...' : '✅ Confirmer la réservation' }}
+          </button>
+          <button class="btn btn-ghost" (click)="fermerModal()">Annuler</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast-success" [class.show]="toastVisible">
+      <div class="toast-icon">✅</div>
+      <div>
+        <div class="toast-title">Réservation confirmée !</div>
+        <div class="toast-sub">{{ toastMessage }}</div>
+      </div>
+    </div>
+
+  </div>
+</div>

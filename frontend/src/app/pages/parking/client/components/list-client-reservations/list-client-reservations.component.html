@@ -1,0 +1,111 @@
+<div class="dark-container">
+  <h2 mat-dialog-title class="dialog-header">
+    <div class="header-content">
+      <mat-icon class="header-icon">account_circle</mat-icon>
+      <div class="title-text">
+        <span class="main-title">Mes Réservations</span>
+        <span class="sub-title">{{ data.nom }}</span>
+      </div>
+    </div>
+  </h2>
+
+  <mat-dialog-content class="custom-scroll">
+    <table mat-table [dataSource]="reservations" class="modern-dark-table"
+      *ngIf="!isLoading && reservations.length > 0">
+
+      <ng-container matColumnDef="matricule">
+        <th mat-header-cell *matHeaderCellDef> VÉHICULE </th>
+        <td mat-cell *matCellDef="let r">
+          <div class="car-info">
+            <span class="plate-number">{{ r.matricule | uppercase }}</span>
+            <div class="spot-pill">
+              <mat-icon>pin_drop</mat-icon>
+              {{ r.displaySpot ? 'Place ' + r.displaySpot : 'En attente' }}
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="dates">
+        <th mat-header-cell *matHeaderCellDef> PLANNING </th>
+        <td mat-cell *matCellDef="let r">
+          <div class="time-block">
+            <div class="time-row in">
+              <mat-icon>login</mat-icon> {{ r.datetimeEntree | date:'dd MMM, HH:mm' }}
+            </div>
+            <div class="time-row out">
+              <mat-icon>logout</mat-icon> {{ r.datetimeSortie | date:'dd MMM, HH:mm' }}
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef> ÉTAT </th>
+        <td mat-cell *matCellDef="let r">
+          <div [ngClass]="{
+            'st-pending': r.statusAction === 'À VENIR',
+            'st-active': r.statusAction === 'EN STATIONNEMENT',
+            'st-expired': r.statusAction === 'TERMINÉE',
+            'st-cancelled': r.statusAction === 'ANNULÉE'
+          }" class="status-chip">
+            <span class="pulse-dot" *ngIf="r.statusAction === 'EN STATIONNEMENT'"></span>
+            {{ r.statusAction }}
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="montant">
+        <th mat-header-cell *matHeaderCellDef> PRIX </th>
+        <td mat-cell *matCellDef="let r">
+          <span class="price-value">{{ r.montant | number:'1.2-2' }} <small>TND</small></span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="qrCode">
+        <th mat-header-cell *matHeaderCellDef class="text-center"> TICKET </th>
+        <td mat-cell *matCellDef="let r" class="text-center">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <div class="qr-glow-card">
+              <qrcode [qrdata]="genererQrCodeData(r.id)" [width]="65" [errorCorrectionLevel]="'M'"></qrcode>
+            </div>
+            <button mat-stroked-button color="primary" 
+                    style="line-height: 24px; padding: 0 10px; font-size: 11px; border-radius: 20px; min-width: 0;" 
+                    (click)="ouvrirTicket(r.id)">
+              <mat-icon style="font-size: 14px; width: 14px; height: 14px; margin-right: 2px;">open_in_new</mat-icon> Ouvrir
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="text-center"> </th>
+        <td mat-cell *matCellDef="let r" class="text-center">
+          <div class="action-group" *ngIf="isFuture(r.datetimeEntree); else locked">
+            <button mat-icon-button class="btn-edit" (click)="editReservation(r)">
+              <mat-icon>edit_note</mat-icon>
+            </button>
+            <button mat-icon-button class="btn-delete" (click)="deleteReservation(r.id)">
+              <mat-icon>delete_sweep</mat-icon>
+            </button>
+          </div>
+          <ng-template #locked>
+            <mat-icon class="icon-lock">lock_clock</mat-icon>
+          </ng-template>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <div *ngIf="!isLoading && reservations.length === 0" class="empty-state">
+      <mat-icon>history_toggle_off</mat-icon>
+      <p>Aucune activité récente.</p>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-footer">
+    <button mat-button mat-dialog-close class="close-button">FERMER</button>
+  </mat-dialog-actions>
+</div>

@@ -1,0 +1,231 @@
+.reserver-layout {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.left-col, .right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-header-title {
+  margin-bottom: 1.5rem;
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem; font-weight: 800; margin-bottom: 4px;
+  }
+  p { color: var(--muted); font-size: 0.875rem; }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group.full { grid-column: 1 / -1; }
+
+.form-actions {
+  display: flex; gap: 12px;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.alert-error {
+  background: rgba(255,77,106,0.1);
+  border: 1px solid rgba(255,77,106,0.3);
+  color: var(--red); padding: 12px 16px;
+  border-radius: 10px; margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+// BANNER TERRAIN
+.terrain-banner {
+  display: flex; align-items: center; gap: 1.5rem;
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: 18px; overflow: hidden;
+  animation: fadeUp 0.4s ease;
+}
+
+.banner-img {
+  width: 100px; height: 100px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3rem;
+  &.bg-foot   { background: linear-gradient(135deg,#0d4d2a,#1a7a44); }
+  &.bg-padel  { background: linear-gradient(135deg,#0d2d4d,#1a4a7a); }
+  &.bg-tennis { background: linear-gradient(135deg,#4d3d0d,#7a621a); }
+  &.bg-basket { background: linear-gradient(135deg,#4d1a0d,#7a2e1a); }
+}
+
+.banner-info {
+  flex: 1; padding: 1rem 0;
+  .banner-type {
+    font-size: 0.7rem; color: var(--green); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px;
+  }
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem; font-weight: 800; margin-bottom: 3px;
+  }
+  p { color: var(--muted); font-size: 0.8rem; margin-bottom: 8px; }
+}
+
+.banner-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+.btag {
+  font-size: 0.7rem; background: var(--bg3);
+  border: 1px solid var(--border);
+  padding: 2px 8px; border-radius: 5px; color: var(--muted);
+}
+
+.banner-price {
+  padding: 1rem 1.25rem; text-align: center;
+  border-left: 1px solid var(--border);
+}
+
+.price-base-label { font-size: 0.68rem; color: var(--muted); margin-bottom: 3px; }
+.price-base-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem; font-weight: 800; color: var(--muted);
+  text-decoration: line-through;
+}
+.price-base-unit { font-size: 0.7rem; color: var(--muted); }
+
+// PRIX DYNAMIQUE
+.price-card { position: sticky; top: 80px; }
+
+.price-header {
+  padding: 1.25rem; border-radius: 12px;
+  margin-bottom: 1rem; text-align: center;
+  border: 1px solid var(--border);
+
+  .price-label {
+    font-size: 0.72rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 5px;
+  }
+  .price-main {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.5rem; font-weight: 800; line-height: 1; margin-bottom: 5px;
+  }
+  .price-niveau { font-size: 0.85rem; font-weight: 600; color: var(--muted); }
+}
+
+.price-detail {
+  padding: 0 0.25rem;
+
+  .price-row {
+    display: flex; justify-content: space-between;
+    font-size: 0.85rem; padding: 5px 0; color: var(--muted);
+    &.total { font-size: 0.92rem; color: var(--text); font-weight: 600; }
+  }
+
+  .price-divider { height: 1px; background: var(--border); margin: 6px 0; }
+
+  .price-total-box {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--green-glow); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 10px 14px; margin-top: 10px;
+    font-size: 0.85rem; font-weight: 600; color: var(--muted);
+
+    .total-amount {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem; font-weight: 800; color: var(--green);
+    }
+  }
+}
+
+.price-factors {
+  margin-top: 1rem; padding-top: 1rem;
+  border-top: 1px solid var(--border);
+
+  .factors-title {
+    font-size: 0.75rem; font-weight: 700; color: var(--muted);
+    margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .factor-item {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 0.8rem; color: var(--text); padding: 3px 0;
+    .factor-dot {
+      width: 5px; height: 5px;
+      background: var(--green); border-radius: 50%; flex-shrink: 0;
+    }
+  }
+}
+
+.price-suggestions {
+  margin-top: 1rem; padding-top: 1rem;
+  border-top: 1px solid var(--border);
+
+  .suggestions-title {
+    font-size: 0.8rem; font-weight: 700;
+    color: var(--muted); margin-bottom: 7px;
+  }
+  .suggestions-list { display: flex; flex-direction: column; gap: 5px; }
+
+  .suggestion-btn {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 7px 11px;
+    cursor: pointer; transition: all 0.2s;
+    color: var(--text); font-family: 'Inter', sans-serif;
+
+    &:hover {
+      border-color: var(--border2);
+      background: var(--green-glow);
+      transform: translateX(3px);
+    }
+
+    .sug-heure { font-weight: 700; font-size: 0.88rem; }
+    .sug-prix  { font-weight: 700; font-size: 0.88rem; }
+    .sug-arrow { color: var(--muted); font-size: 0.82rem; }
+  }
+}
+
+.price-empty {
+  text-align: center; padding: 1.5rem;
+
+  .empty-icon-price { font-size: 2.5rem; opacity: 0.2; margin-bottom: 0.8rem; }
+  h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem; font-weight: 700; margin-bottom: 6px;
+  }
+  p { font-size: 0.82rem; color: var(--muted); margin-bottom: 1rem; line-height: 1.5; }
+
+  .price-features {
+    display: flex; flex-direction: column; gap: 5px; text-align: left;
+    .feature {
+      font-size: 0.78rem; color: var(--muted);
+      padding: 4px 9px; background: var(--bg3);
+      border-radius: 5px; border: 1px solid var(--border);
+    }
+  }
+}
+
+.price-loading {
+  text-align: center; padding: 1.5rem; color: var(--muted);
+  .loading-spinner {
+    font-size: 1.8rem; display: block;
+    margin-bottom: 7px;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@media (max-width: 900px) {
+  .reserver-layout { grid-template-columns: 1fr; }
+  .price-card { position: static; }
+}
+@media (max-width: 600px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .form-group.full { grid-column: 1; }
+  .terrain-banner { flex-direction: column; }
+  .banner-img { width: 100%; height: 90px; }
+  .banner-price { border-left: none; border-top: 1px solid var(--border); }
+}

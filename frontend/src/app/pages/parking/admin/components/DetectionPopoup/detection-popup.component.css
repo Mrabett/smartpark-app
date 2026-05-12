@@ -1,0 +1,225 @@
+/* Conteneur global — s'empile verticalement si plusieurs détections */
+.detections-container {
+    position: fixed;
+    top: 80px;
+    right: 24px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 380px;
+    width: 100%;
+}
+
+/* Carte individuelle */
+.detection-card {
+    background: #ffffff;
+    border: 1.5px solid #f59e0b;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* En-tête avec point clignotant */
+.detection-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pulse-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #f59e0b;
+    animation: pulse 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.5;
+        transform: scale(1.3);
+    }
+}
+
+.detection-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #92400e;
+}
+
+/* Photo de la plaque */
+.plate-image-wrapper {
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f3f4f6;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.plate-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.plate-no-image {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+.plate-no-image mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    color: #d1d5db;
+}
+
+/* Matricule */
+.matricule-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fef3c7;
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+
+.matricule-label {
+    font-size: 12px;
+    color: #92400e;
+}
+
+.matricule-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #78350f;
+    letter-spacing: 1.5px;
+    font-family: monospace;
+}
+
+/* Question */
+.question {
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.question strong {
+    color: #1d4ed8;
+}
+
+/* Boutons */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-oui {
+    background-color: #16a34a !important;
+    color: white !important;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+}
+
+.btn-oui mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.btn-non {
+    color: #6b7280;
+    border-color: #d1d5db !important;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+}
+
+.btn-non mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Timer hint */
+.timer-hint {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+.timer-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .detection-card {
+        background: #1f2937;
+        border-color: #d97706;
+    }
+
+    .detection-title {
+        color: #fde68a;
+    }
+
+    .matricule-display {
+        background: #451a03;
+    }
+
+    .matricule-label {
+        color: #fde68a;
+    }
+
+    .matricule-value {
+        color: #fef3c7;
+    }
+
+    .question {
+        color: #d1d5db;
+    }
+
+    .timer-hint {
+        color: #6b7280;
+    }
+}

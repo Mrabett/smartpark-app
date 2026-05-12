@@ -1,0 +1,116 @@
+<div class="sp-card" style="margin: 0; border: none; border-radius: 0; background: var(--bg); max-height: 90vh; overflow-y: auto;">
+  <div class="section-header">
+    <h2 class="section-title">
+      <div class="logo-icon" style="width: 28px; height: 28px; font-size: 14px; margin-right: 10px;">
+        <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: white;">list_alt</mat-icon>
+      </div>
+      Réservations : <span style="color: var(--green); margin-left: 5px;">{{ data.nom }}</span>
+    </h2>
+    <button class="btn btn-ghost" style="padding: 5px;" mat-dialog-close>
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+    <div class="sp-field" style="flex: 1;">
+      <label class="form-label">Rechercher matricule, client ou place...</label>
+      <input type="text" class="form-input" [(ngModel)]="filterValues.text" (keyup)="applyFilter()" placeholder="Recherche...">
+    </div>
+    
+    <div class="sp-field">
+      <label class="form-label">Filtrer par date</label>
+      <input type="date" class="form-input" [(ngModel)]="filterValues.date" (change)="applyFilter()">
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" style="text-align: center; padding: 20px;">
+    <mat-spinner diameter="40" style="margin: 0 auto;"></mat-spinner>
+  </div>
+
+  <table class="sp-table" *ngIf="!isLoading && dataSource.filteredData.length > 0">
+    <thead>
+      <tr>
+        <th style="min-width: 150px;">Photos (IN &rarr; OUT)</th>
+        <th>Véhicule & Client</th>
+        <th>Période</th>
+        <th>État</th>
+        <th>Prix</th>
+        <th style="text-align: center;">Ticket</th>
+        <th style="text-align: right;"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of dataSource.filteredData">
+        <td>
+          <div style="display: flex; gap: 6px; align-items: center; justify-content: center;">
+            <img *ngIf="r.imageEntree" [src]="'data:image/jpeg;base64,' + r.imageEntree"
+              style="width: 65px; height: 42px; object-fit: cover; border-radius: 4px; border: 1px solid var(--green);"
+              title="Entrée">
+            <mat-icon *ngIf="!r.imageEntree" style="color: var(--muted);" title="Pas d'image d'entrée">camera_alt</mat-icon>
+
+            <mat-icon style="font-size: 18px; color: var(--muted); width: 18px; height: 18px;">arrow_right</mat-icon>
+
+            <img *ngIf="r.imageSortie" [src]="'data:image/jpeg;base64,' + r.imageSortie"
+              style="width: 65px; height: 42px; object-fit: cover; border-radius: 4px; border: 1px solid var(--amber);"
+              title="Sortie">
+            <mat-icon *ngIf="!r.imageSortie" style="color: var(--muted);" title="Pas d'image de sortie">camera_alt</mat-icon>
+          </div>
+        </td>
+        <td>
+          <div style="font-weight: bold; font-size: 1.1em; color: var(--text);">{{ r.matricule | uppercase }}</div>
+          <div style="font-size: 0.9em; color: var(--muted); margin-top: 2px; display: flex; align-items: center; gap: 4px;">
+            <mat-icon style="font-size: 14px; width: 14px; height: 14px;">person</mat-icon>
+            {{ r.displayUser }}
+          </div>
+          <div style="font-size: 0.8em; color: var(--blue); font-weight: 500; margin-top: 4px;">
+            Place: {{ r.displaySpot }}
+          </div>
+        </td>
+        <td>
+          <div style="font-size: 0.85em; color: var(--muted);">
+            <strong style="color: var(--text);">IN :</strong> {{ r.datetimeEntree | date:'dd/MM HH:mm' }}<br>
+            <strong style="color: var(--text);">OUT:</strong> {{ r.datetimeSortie | date:'dd/MM HH:mm' }}
+          </div>
+        </td>
+        <td>
+          <span class="badge" [ngClass]="{
+            'badge-amber': r.statusAction?.includes('ATTENTE') || r.statusAction?.includes('VENIR'),
+            'badge-green': r.statusAction?.includes('ENTREE') || r.statusAction?.includes('STATIONNEMENT'),
+            'badge-blue': r.statusAction?.includes('SORTIE') || r.statusAction?.includes('TERMINE'),
+            'badge-red': r.statusAction?.includes('ANNUL')
+          }">
+            {{ r.statusAction }}
+          </span>
+        </td>
+        <td>
+          <span style="color: var(--green); font-weight: bold;">{{ r.displayMontant | number:'1.2-2' }} TND</span>
+        </td>
+        <td style="text-align: center;">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+            <div style="background: white; padding: 4px; border-radius: 4px; display: inline-block;">
+              <qrcode [qrdata]="generateDirectPdfLink(r.id)" [width]="60" [errorCorrectionLevel]="'M'"></qrcode>
+            </div>
+            <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;" (click)="ouvrirTicket(r.id)">
+              <mat-icon style="font-size: 14px; width: 14px; height: 14px; margin-right: 4px;">open_in_new</mat-icon>
+              Ouvrir
+            </button>
+          </div>
+        </td>
+        <td style="text-align: right;">
+          <button class="btn btn-ghost" style="padding: 6px;" (click)="editReservation(r)">
+            <mat-icon style="font-size: 18px; width: 18px; height: 18px;">edit</mat-icon>
+          </button>
+          <button class="btn btn-danger" style="padding: 6px; margin-left: 5px;" (click)="deleteReservation(r.id)">
+            <mat-icon style="font-size: 18px; width: 18px; height: 18px;">delete</mat-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!isLoading && dataSource.filteredData.length === 0" class="empty-state">
+    <mat-icon class="empty-icon">history</mat-icon>
+    <h3>Aucune réservation</h3>
+    <p>Aucune réservation trouvée pour ce parking.</p>
+  </div>
+</div>

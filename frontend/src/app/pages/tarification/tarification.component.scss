@@ -1,0 +1,130 @@
+// ── Stats cards ──────────────────────────────────────────
+.tarif-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.tarif-stat {
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 1.1rem;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+
+  &.red::before    { background: var(--red); }
+  &.amber::before  { background: var(--amber); }
+  &.green::before  { background: var(--green); }
+  &.blue::before   { background: var(--blue); }
+
+  .ts-label {
+    font-size: .72rem; font-weight: 600;
+    color: var(--text-2); text-transform: uppercase;
+    letter-spacing: .6px; margin-bottom: .5rem;
+  }
+
+  .ts-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem; font-weight: 800;
+    line-height: 1; margin-bottom: 3px;
+    &.red    { color: var(--red); }
+    &.amber  { color: var(--amber); }
+    &.green  { color: var(--green); }
+    &.blue   { color: var(--blue); }
+  }
+
+  .ts-sub { font-size: .78rem; color: var(--text-2); }
+}
+
+// ── Table ────────────────────────────────────────────────
+.admin-tarif-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+
+  th {
+    padding: 9px 12px;
+    text-align: left;
+    font-size: .72rem; font-weight: 600;
+    color: var(--text-2);
+    text-transform: uppercase; letter-spacing: .6px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-3);
+  }
+
+  td {
+    padding: 11px 12px;
+    font-size: .875rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  tbody tr:hover td { background: var(--bg-3); }
+  tbody tr:last-child td { border-bottom: none; }
+}
+
+.t-name { font-weight: 600; font-size: .875rem; }
+.t-type { font-size: .75rem; color: var(--text-2); margin-top: 2px; }
+
+// ── Niveau badge ─────────────────────────────────────────
+.niveau-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: .74rem; font-weight: 700; white-space: nowrap;
+}
+
+// ── Factor tags ──────────────────────────────────────────
+.factor-tag {
+  display: inline-flex; align-items: center;
+  padding: 2px 7px; border-radius: 4px;
+  font-size: .7rem; font-weight: 600;
+
+  &.red   { background: var(--red-dim); color: var(--red); }
+  &.amber { background: var(--amber-dim); color: var(--amber); }
+  &.green { background: var(--green-dim); color: var(--green); }
+}
+
+// ── Occupation bar ───────────────────────────────────────
+.occ-bar-wrap {
+  display: flex; align-items: center; gap: 7px;
+
+  .occ-bar {
+    flex: 1; height: 4px;
+    background: var(--bg-4); border-radius: 2px;
+    overflow: hidden; min-width: 50px;
+
+    .occ-fill { height: 100%; border-radius: 2px; transition: width .6s ease; }
+  }
+
+  .occ-pct { font-size: .75rem; font-weight: 600; color: var(--text-2); min-width: 28px; }
+}
+
+// ── Règles ───────────────────────────────────────────────
+.rule-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 0; border-bottom: 1px solid var(--border);
+  &:last-child { border-bottom: none; }
+
+  .rule-icon {
+    width: 36px; height: 36px; border-radius: var(--r);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .95rem; flex-shrink: 0;
+  }
+
+  .rule-info {
+    flex: 1;
+    .rule-name { font-weight: 600; font-size: .875rem; }
+    .rule-desc { font-size: .75rem; color: var(--text-2); margin-top: 1px; }
+  }
+
+  .rule-effect { font-size: .95rem; font-weight: 800; flex-shrink: 0; }
+}

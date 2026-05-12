@@ -1,0 +1,92 @@
+<div class="user-page">
+  <div class="page-content">
+
+    <!-- HERO -->
+    <div class="user-hero">
+      <div>
+        <h1>Réservez votre <span>Terrain</span></h1>
+        <p>{{ terrains.length }} terrains disponibles · Choisissez et réservez en quelques clics</p>
+      </div>
+      <a routerLink="/user/reservations" class="btn btn-ghost">
+        📅 Mes réservations
+      </a>
+    </div>
+
+    <!-- RECHERCHE + FILTRES -->
+    <div class="search-filter-bar">
+      <div class="search-box">
+        <span>🔍</span>
+        <input type="text" placeholder="Rechercher un terrain..."
+               [(ngModel)]="recherche"
+               (input)="appliquerFiltres()">
+      </div>
+      <div class="filtres">
+        <button *ngFor="let f of filtres"
+                class="tab" [class.active]="filtreActif === f.value"
+                (click)="filtrer(f.value)">
+          {{ f.label }}
+        </button>
+      </div>
+    </div>
+
+    <!-- GRILLE TERRAINS -->
+    <div class="terrains-grid" *ngIf="terrainsFiltres.length > 0">
+      <div class="terrain-card"
+           *ngFor="let t of terrainsFiltres; let i = index"
+           [style.animation-delay]="(i * 0.08) + 's'">
+
+        <div class="terrain-img" [ngClass]="getBgClass(t.type)">
+          <span class="terrain-emoji">{{ getIcon(t.type) }}</span>
+          <span class="statut-badge"
+                [class.disponible]="t.statut === 'DISPONIBLE'"
+                [class.indisponible]="t.statut !== 'DISPONIBLE'">
+            {{ t.statut === 'DISPONIBLE' ? '● Disponible' : '● Indisponible' }}
+          </span>
+        </div>
+
+        <div class="terrain-body">
+          <div class="terrain-name">{{ t.nom }}</div>
+          <div class="terrain-type">
+            {{ getIcon(t.type) }} {{ t.type }}
+            · {{ t.description || 'Terrain sportif' }}
+          </div>
+
+          <div class="terrain-meta">
+            <div class="meta-item">
+              <div class="meta-label">👥 Capacité</div>
+              <div class="meta-value">{{ t.capacite }} joueurs</div>
+            </div>
+            <div class="meta-item">
+              <div class="meta-label">💰 Tarif</div>
+              <div class="meta-value green">{{ t.tarifHeure }} DT/h</div>
+            </div>
+          </div>
+
+          <div class="equipements"
+               *ngIf="t.equipements && t.equipements.length > 0">
+            <span class="eq-tag" *ngFor="let e of t.equipements">
+              {{ e }}
+            </span>
+          </div>
+
+          <button class="btn btn-primary reserve-btn"
+                  [disabled]="t.statut !== 'DISPONIBLE'"
+                  [class.disabled-btn]="t.statut !== 'DISPONIBLE'"
+                  (click)="reserver(t.id!)">
+            {{ t.statut === 'DISPONIBLE'
+               ? '📅 Réserver maintenant'
+               : '🚫 Non disponible' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMPTY -->
+    <div *ngIf="terrainsFiltres.length === 0" class="empty-state">
+      <div class="empty-icon">🏟️</div>
+      <h3>Aucun terrain trouvé</h3>
+      <p>Essayez un autre filtre ou revenez plus tard</p>
+    </div>
+
+  </div>
+</div>

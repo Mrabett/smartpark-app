@@ -1,0 +1,90 @@
+<div class="page-content">
+
+  <div class="hero">
+    <div>
+      <h1>🏟️ Gestion des <span>Terrains</span></h1>
+      <p>{{ terrains.length }} terrain(s) enregistré(s)</p>
+    </div>
+    <a routerLink="/terrains/nouveau" class="btn btn-primary">
+      ➕ Nouveau Terrain
+    </a>
+  </div>
+
+  <div *ngIf="message" class="alert-msg">{{ message }}</div>
+
+  <div class="filtres">
+    <button *ngFor="let f of filtres"
+            class="tab" [class.active]="filtreActif === f.value"
+            (click)="filtrer(f.value)">
+      {{ f.label }}
+    </button>
+  </div>
+
+  <div class="terrains-grid" *ngIf="terrainsFiltres.length > 0">
+    <div class="terrain-card"
+         *ngFor="let t of terrainsFiltres; let i = index"
+         [style.animation-delay]="(i * 0.08) + 's'">
+
+      <div class="terrain-img" [ngClass]="getBgClass(t.type)">
+        <span class="terrain-emoji">{{ getIcon(t.type) }}</span>
+        <span class="terrain-status badge"
+              [ngClass]="getBadgeClass(t.statut || '')">
+          {{ t.statut === 'DISPONIBLE' ? '● Disponible' :
+             t.statut === 'OCCUPE'     ? '● Occupé'     : '⚙ Maintenance' }}
+        </span>
+      </div>
+
+      <div class="terrain-body">
+        <div class="terrain-name">{{ t.nom }}</div>
+        <div class="terrain-type">
+          {{ getIcon(t.type) }} {{ t.type }}
+          · {{ t.description || 'Terrain sportif' }}
+        </div>
+
+        <div class="terrain-meta">
+          <div class="meta-item">
+            <div class="meta-label">Capacité</div>
+            <div class="meta-value">{{ t.capacite }} joueurs</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Tarif/heure</div>
+            <div class="meta-value green">{{ t.tarifHeure }} DT</div>
+          </div>
+        </div>
+
+        <div class="equipements"
+             *ngIf="t.equipements && t.equipements.length > 0">
+          <span class="eq-tag" *ngFor="let e of t.equipements">{{ e }}</span>
+        </div>
+
+        <!-- ADMIN : MODIFIER ET SUPPRIMER SEULEMENT -->
+        <div class="terrain-actions">
+          <a [routerLink]="['/terrains/modifier', t.id]"
+             class="btn-sm btn-edit">
+            ✏️ Modifier
+          </a>
+          <button (click)="changerStatut(t)"
+                  class="btn-sm btn-statut">
+            🔄 Statut
+          </button>
+        </div>
+        <button (click)="delete(t.id!)"
+                class="btn-sm btn-delete"
+                style="width:100%; margin-top:6px;">
+          🗑️ Supprimer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="terrainsFiltres.length === 0" class="empty-state">
+    <div class="empty-icon">🏟️</div>
+    <h3>Aucun terrain trouvé</h3>
+    <p>Ajoutez votre premier terrain</p>
+    <a routerLink="/terrains/nouveau" class="btn btn-primary"
+       style="margin-top:1.5rem;">
+      ➕ Ajouter un terrain
+    </a>
+  </div>
+
+</div>

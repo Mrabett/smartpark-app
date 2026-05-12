@@ -1,0 +1,47 @@
+<div class="fullscreen-app">
+  <header class="app-header">
+    <div class="title-group">
+      <mat-icon class="header-icon">location_on</mat-icon>
+      <h1>Sélectionner une place pour <strong>{{ data.matricule }}</strong></h1>
+    </div>
+    <button mat-icon-button class="close-app" (click)="close()" matTooltip="Annuler">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <aside class="control-side-panel">
+    <div class="instruction-box">
+      <strong>Client Spontané</strong><br/>
+      Sélectionnez une place LIBRE pour démarrer la facturation.
+    </div>
+
+    <div class="side-legend">
+      <div class="legend-item"><span class="dot libre"></span> Libre</div>
+      <div class="legend-item"><span class="dot occupe"></span> Occupé</div>
+      <div class="legend-item"><span class="dot reserve"></span> Réservé / Indisponible</div>
+      <div class="legend-item"><span class="dot maintenance"></span> Maintenance</div>
+    </div>
+  </aside>
+
+  <main class="map-viewport">
+    <div class="canvas-container">
+      <div *ngFor="let spot of spots" 
+           class="spot-card clickable" 
+           [ngClass]="getSpotClass(spot)"
+           [style.left.%]="((spot.x || 0) / 800) * 100" 
+           [style.top.%]="((spot.y || 0) / 600) * 100"
+           [matTooltip]="getSpotTooltip(spot)"
+           matTooltipClass="custom-tooltip"
+           (click)="selectSpot(spot)">
+        
+        <div class="spot-content">
+          <span class="spot-id">{{ spot.nom }}</span>
+          <mat-icon class="spot-icon">
+            {{ getSpotIcon(spot) }}
+          </mat-icon>
+        </div>
+        
+      </div>
+    </div>
+  </main>
+</div>

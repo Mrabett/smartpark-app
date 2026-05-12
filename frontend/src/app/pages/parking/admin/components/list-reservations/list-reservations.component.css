@@ -1,0 +1,156 @@
+.w-100 {
+  width: 100%;
+}
+
+.spot-badge {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.85em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  border: 1px solid #bbdefb;
+}
+
+.mat-column-client {
+  padding-left: 16px !important;
+}
+
+.mat-elevation-z2 {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+}
+
+tr:hover {
+  background-color: #f9f9f9;
+}
+
+.spin {
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.spot-badge {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.85em;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  border: 1px solid #bbdefb;
+}
+
+.mat-column-client {
+  padding-left: 16px !important;
+}
+
+.mat-elevation-z2 {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+}
+
+.spot-badge-active {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #c8e6c9;
+}
+
+.spot-badge-empty {
+  background-color: #f5f5f5;
+  color: #757575;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  font-style: italic;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #e0e0e0;
+}
+
+.spin {
+  animation: rotate 2s linear infinite;
+  color: #3f51b5;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+tr:hover {
+  background-color: #fcfcfc;
+}
+
+.presence-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.status-pending {
+  background: #fff3e0;
+  color: #ef6c00;
+  border: 1px solid #ffe0b2;
+}
+
+/* Orange */
+.status-active {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+/* Vert */
+.status-expired {
+  background: #f5f5f5;
+  color: #757575;
+  border: 1px solid #e0e0e0;
+}
+
+/* Gris */
+.status-cancelled {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+/* Rouge */
+
+.spot-badge-active,
+.spot-badge-client {
+  background: #e3f2fd;
+  color: #1565c0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+}

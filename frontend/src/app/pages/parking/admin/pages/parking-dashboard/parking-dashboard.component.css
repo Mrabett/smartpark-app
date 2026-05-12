@@ -1,0 +1,430 @@
+/* ================================================================
+   PARKING DASHBOARD — Admin (style Malek original)
+   Thème sombre intégré + classes sp-* manquantes
+   ================================================================ */
+
+/* ── Conteneur principal ────────────────────────────────────────── */
+:host {
+    display: block;
+    background: #0b0f1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+}
+
+.container {
+    padding: 25px 30px;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+
+/* ── Hero Section ───────────────────────────────────────────────── */
+.sp-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.sp-hero-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.sp-hero-title span {
+    color: #22c55e;
+}
+
+.sp-hero-sub {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #8a9bb0;
+    font-size: 0.88rem;
+    margin-top: 6px;
+}
+
+.sp-hero-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* ── Boutons sp-btn ─────────────────────────────────────────────── */
+.sp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+.sp-btn mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+.sp-btn.primary {
+    background: #22c55e;
+    color: #000;
+    border-color: #22c55e;
+}
+
+.sp-btn.primary:hover {
+    background: #16a34a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+.sp-btn.secondary {
+    background: #1a2438;
+    color: #e0e0e0;
+    border-color: #2a3548;
+}
+
+.sp-btn.secondary:hover {
+    background: #243350;
+    border-color: #3a4a60;
+}
+
+.sp-btn.ghost {
+    background: transparent;
+    color: #8a9bb0;
+    border-color: #2a3548;
+}
+
+.sp-btn.ghost:hover {
+    color: #e0e0e0;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #3a4a60;
+}
+
+/* ── Live dot ───────────────────────────────────────────────────── */
+.live-dot {
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+    }
+}
+
+/* ── Scanner ────────────────────────────────────────────────────── */
+.scanner-container {
+    max-width: 500px;
+    margin: 0 auto 20px auto;
+    border: 3px solid #7c3aed;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.25);
+    background: #000;
+}
+
+/* ── Filtres / Recherche ────────────────────────────────────────── */
+.sp-filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.sp-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #141c28;
+    border: 1px solid #2a3548;
+    border-radius: 10px;
+    padding: 8px 14px;
+    transition: border-color 0.2s;
+}
+
+.sp-search:focus-within {
+    border-color: #22c55e;
+}
+
+.sp-search .si {
+    color: #8a9bb0;
+    font-size: 20px;
+}
+
+.sp-search input,
+.sp-search select {
+    background: transparent;
+    border: none;
+    color: #e0e0e0;
+    outline: none;
+    font-size: 0.88rem;
+    font-family: inherit;
+    flex: 1;
+    min-width: 120px;
+}
+
+.sp-search input::placeholder {
+    color: #5a6a80;
+}
+
+.sp-search select option {
+    background: #141c28;
+    color: #e0e0e0;
+}
+
+/* ── Badges ─────────────────────────────────────────────────────── */
+.sp-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+}
+
+.sp-badge.blue {
+    background: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.sp-badge.purple {
+    background: rgba(168, 85, 247, 0.15);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+.sp-badge.green {
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.sp-badge.amber {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.sp-badge.red {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* ── Table ──────────────────────────────────────────────────────── */
+.sp-tbl-wrap {
+    background: #111827;
+    border: 1px solid #1e293b;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+table.sp-tbl {
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
+    color: #e0e0e0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
+    color: #e0e0e0;
+}
+
+th.mat-mdc-header-cell,
+th.mat-header-cell {
+    padding: 14px 16px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #8a9bb0;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: #0b1120;
+    border-bottom: 1px solid #1e293b;
+}
+
+td.mat-mdc-cell,
+td.mat-cell {
+    padding: 14px 16px;
+    border-bottom: 1px solid #1e293b;
+    font-size: 0.88rem;
+    color: #e0e0e0;
+}
+
+tr.mat-mdc-row:hover,
+tr.mat-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+tr.mat-mdc-row:last-child td,
+tr.mat-row:last-child td {
+    border-bottom: none;
+}
+
+/* Action buttons in the table */
+td button.mat-mdc-icon-button,
+td button[mat-icon-button] {
+    color: #8a9bb0;
+    transition: all 0.15s;
+}
+
+td button.mat-mdc-icon-button:hover,
+td button[mat-icon-button]:hover {
+    transform: scale(1.15);
+}
+
+/* ── Ticket card (quand on scanne un QR) ────────────────────────── */
+.ticket-overlay {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.ticket-card {
+    max-width: 500px;
+    width: 100%;
+    padding: 0;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4) !important;
+    background: #fff;
+    color: rgba(0, 0, 0, 0.87);
+    overflow: hidden;
+}
+
+.ticket-card mat-card-content {
+    color: rgba(0, 0, 0, 0.87);
+}
+
+/* ── Empty state ────────────────────────────────────────────────── */
+.sp-empty-state {
+    text-align: center;
+    padding: 60px;
+    border-radius: 12px;
+    border: 1px dashed #2a3548;
+    background: #111827;
+}
+
+.sp-empty-state mat-icon {
+    font-size: 4rem;
+    width: auto;
+    height: auto;
+    color: #5a6a80;
+    opacity: 0.4;
+}
+
+.sp-empty-state h3 {
+    color: #8a9bb0;
+    margin-top: 15px;
+    font-size: 1.1rem;
+}
+
+.sp-empty-state p {
+    color: #5a6a80;
+    font-size: 0.9rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .sp-hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .sp-hero-actions {
+        width: 100%;
+    }
+
+    .sp-hero-actions .sp-btn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .popup-content {
+        background-color: #b46b00;
+        /* Le orange de ton schéma */
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        border: 2px solid #ff9900;
+    }
+
+    .photo-plaque {
+        width: 200px;
+        border-radius: 5px;
+        margin-bottom: 15px;
+    }
+
+    .popup-actions button {
+        margin: 0 10px;
+        padding: 10px 20px;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-oui {
+        background: transparent;
+        border: 1px solid white;
+        color: white;
+    }
+
+    .btn-non {
+        background: transparent;
+        border: 1px solid white;
+        color: white;
+    }
+
+}

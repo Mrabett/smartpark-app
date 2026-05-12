@@ -1,0 +1,204 @@
+<div class="ticket-wrapper">
+
+  <!-- Chargement -->
+  <div *ngIf="loading" class="center-spinner">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Chargement du ticket...</p>
+  </div>
+
+  <!-- Erreur -->
+  <div *ngIf="error && !loading" class="error-state">
+    <mat-icon>error_outline</mat-icon>
+    <p>Réservation introuvable.</p>
+  </div>
+
+  <!-- Ticket principal -->
+  <div *ngIf="res && !loading" class="ticket-card">
+
+    <!-- En-tête statut -->
+    <div class="ticket-header">
+      <div class="status-badge" [ngClass]="'status-' + statusAction.toLowerCase()">
+        {{ statusLabel }}
+      </div>
+      <div class="spontane-badge" *ngIf="res.spontane">
+        <mat-icon>directions_car</mat-icon> Client spontané
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- ─── SECTION PHOTOS PLAQUES (vue employé uniquement) ─── -->
+    <div class="photos-section">
+      <h3 class="photos-title">
+        <mat-icon>camera_alt</mat-icon>
+        Vérification visuelle des plaques
+      </h3>
+
+      <div class="photos-grid">
+
+        <!-- Photo d'entrée -->
+        <div class="photo-card">
+          <div class="photo-label">
+            <mat-icon class="icon-entree">login</mat-icon>
+            Photo à l'entrée
+          </div>
+          <div class="photo-frame" [class.waiting]="!res.imageEntree">
+            <img *ngIf="res.imageEntree" [src]="'data:image/jpeg;base64,' + res.imageEntree" alt="Plaque à l'entrée"
+              class="plate-photo" />
+            <div *ngIf="!res.imageEntree" class="photo-placeholder">
+              <mat-icon>hourglass_top</mat-icon>
+              <span>En attente de la caméra d'entrée</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flèche de comparaison -->
+        <div class="compare-arrow">
+          <mat-icon>compare_arrows</mat-icon>
+          <span>Comparer</span>
+        </div>
+
+        <!-- Photo de sortie -->
+        <div class="photo-card">
+          <div class="photo-label">
+            <mat-icon class="icon-sortie">logout</mat-icon>
+            Photo à la sortie
+          </div>
+          <div class="photo-frame" [class.waiting]="!imageSortieDisponible">
+            <img *ngIf="imageSortieDisponible" [src]="'data:image/jpeg;base64,' + res.imageSortie"
+              alt="Plaque à la sortie" class="plate-photo" />
+            <div *ngIf="!imageSortieDisponible" class="photo-placeholder">
+              <mat-icon>hourglass_top</mat-icon>
+              <span>En attente de la caméra de sortie</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Message d'avertissement si photos différentes -->
+      <div class="warning-banner" *ngIf="imageSortieDisponible">
+        <mat-icon>info_outline</mat-icon>
+        Vérifiez que les deux plaques correspondent avant de valider la sortie.
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- ─── INFOS RÉSERVATION ─── -->
+    <div class="info-section">
+
+      <div class="info-row">
+        <span class="info-label"><mat-icon>person</mat-icon> Client</span>
+        <span class="info-value">{{ res.userName || 'Spontané' }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label"><mat-icon>directions_car</mat-icon> Matricule</span>
+        <div class="matricule-edit-container">
+          <span class="info-value matricule" *ngIf="!editingMatricule">{{ res.matricule }}</span>
+          <input type="text" [(ngModel)]="newMatricule" *ngIf="editingMatricule" class="matricule-input"
+            placeholder="Ex: 123TN456" />
+
+          <button mat-icon-button *ngIf="!editingMatricule && peutValiderEntree" (click)="startEditMatricule()"
+            matTooltip="Modifier le matricule">
+            <mat-icon style="font-size: 18px;">edit</mat-icon>
+          </button>
+
+          <div class="edit-actions" *ngIf="editingMatricule">
+            <button mat-icon-button color="primary" (click)="saveMatricule()" matTooltip="Enregistrer">
+              <mat-icon>check</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="cancelEditMatricule()" matTooltip="Annuler">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-row" *ngIf="res.spotNom">
+        <span class="info-label"><mat-icon>local_parking</mat-icon> Place</span>
+        <span class="info-value">{{ res.spotNom }} — {{ res.parkingNom }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label"><mat-icon>schedule</mat-icon> Entrée prévue</span>
+        <span class="info-value">{{ res.datetimeEntree | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label"><mat-icon>event</mat-icon> Sortie prévue</span>
+        <span class="info-value">{{ res.datetimeSortie | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+
+    </div>
+
+    <mat-divider></mat-divider>
+
+
+
+    <!-- ─── QR CODE ─── -->
+    <div class="qr-section">
+      <qrcode [qrdata]="getTicketUrl(res.id)" [width]="160" [margin]="1" errorCorrectionLevel="M">
+      </qrcode>
+      <p class="qr-hint">Lien public pour le client</p>
+      <button mat-stroked-button color="primary"
+        style="line-height: 28px; padding: 0 12px; font-size: 12px; border-radius: 20px; margin-top: 5px;"
+        (click)="ouvrirTicketClient()">
+        <mat-icon style="font-size: 16px; width: 16px; height: 16px; margin-right: 4px;">open_in_new</mat-icon> Ouvrir
+      </button>
+    </div>
+
+    <!-- ─── TOTAL À ENCAISSER ─── -->
+    <div *ngIf="statusAction !== 'EN_ATTENTE'"
+      style="background: #111; color: #4fc3f7; padding: 20px; text-align: center; margin: 15px;">
+      <span style="font-size: 0.9rem; color: #b0bec5; font-weight: bold; letter-spacing: 1px;">TOTAL À ENCAISSER</span>
+      <h1 style="font-size: 2.8rem; font-weight: 900; color: #00e676; margin: 5px 0 0 0;">
+        {{ montantTotalFinal | number:'1.2-2' }} TND
+      </h1>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- ─── ACTIONS EMPLOYÉ ─── -->
+    <div class="actions-section">
+
+      <!-- Valider entrée -->
+      <button mat-flat-button color="primary" *ngIf="peutValiderEntree" (click)="validerEntree()"
+        class="action-btn btn-entree">
+        <mat-icon>login</mat-icon>
+        Valider l'entrée
+      </button>
+
+      <!-- Valider sortie (actif seulement si la photo de sortie est disponible) -->
+      <button mat-flat-button color="warn" *ngIf="peutValiderSortie" (click)="validerSortie()"
+        [disabled]="!imageSortieDisponible" class="action-btn btn-sortie">
+        <mat-icon>logout</mat-icon>
+        Valider la sortie
+      </button>
+
+      <div *ngIf="peutValiderSortie && !imageSortieDisponible" class="waiting-hint">
+        <mat-icon>hourglass_top</mat-icon>
+        En attente de la photo de sortie...
+      </div>
+
+      <!-- Ticket clôturé -->
+      <div *ngIf="statusAction === 'SORTIE_VALIDEE'" class="cloture-badge">
+        <mat-icon>check_circle</mat-icon>
+        Ticket clôturé
+      </div>
+
+      <!-- Utilitaires -->
+      <div class="util-buttons">
+        <button mat-stroked-button (click)="downloadAsPDF()">
+          <mat-icon>picture_as_pdf</mat-icon> PDF
+        </button>
+        <button mat-stroked-button (click)="printTicket()">
+          <mat-icon>print</mat-icon> Imprimer
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>

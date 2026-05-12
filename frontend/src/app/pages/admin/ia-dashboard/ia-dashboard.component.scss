@@ -1,0 +1,43 @@
+.sentiment-bar {
+  height: 12px; border-radius: 6px; overflow: hidden;
+  display: flex; background: var(--bg3);
+}
+
+.sb-positif { background: var(--green);  transition: width 1s ease; }
+.sb-neutre  { background: var(--amber);  transition: width 1s ease; }
+.sb-negatif { background: var(--red);    transition: width 1s ease; }
+
+.models-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 1rem; margin-top: 0.5rem;
+}
+
+.model-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; background: var(--bg3);
+  border-radius: 14px; border: 1px solid var(--border);
+  transition: all 0.2s;
+  &:hover { border-color: var(--border2); }
+}
+
+.model-icon {
+  font-size: 1.5rem; flex-shrink: 0;
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--card2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.model-info { flex: 1; min-width: 0; }
+
+.model-name  { font-weight: 700; font-size: 0.9rem; margin-bottom: 2px; }
+.model-desc  { font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; }
+
+.model-badge {
+  font-size: 0.65rem; color: var(--blue); font-family: 'Courier New', monospace;
+  background: rgba(59,158,255,0.08); padding: 2px 6px;
+  border-radius: 4px; display: inline-block;
+}
+
+@media (max-width: 700px) {
+  .models-grid { grid-template-columns: 1fr; }
+}

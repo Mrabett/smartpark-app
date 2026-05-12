@@ -1,0 +1,156 @@
+<div class="user-page">
+
+
+
+  <div class="page-content">
+
+    <div class="param-hero anim-fade-up">
+      <div class="param-hero-left">
+        <div class="big-avatar">⚽</div>
+        <div>
+          <h1>Créer un <span>Match</span></h1>
+          <p>Organisez votre match et
+             invitez des joueurs</p>
+        </div>
+      </div>
+      <a routerLink="/user/matchs"
+         class="btn btn-secondary">← Retour</a>
+    </div>
+
+    <div class="creer-layout">
+
+      <!-- FORMULAIRE -->
+      <div class="sp-card anim-scale-up">
+
+        <div *ngIf="erreur"
+             class="alert alert-danger"
+             style="margin-bottom:1rem">
+          ⚠️ {{ erreur }}
+        </div>
+
+        <!-- SPORT -->
+        <div class="form-section">
+          <div class="fs-title">🏅 Type de sport</div>
+          <div class="sport-grid">
+            <button *ngFor="let s of sports"
+                    class="sport-btn"
+                    [class.active]="form.sport === s.value"
+                    type="button"
+                    (click)="form.sport = s.value;
+                             updateFormat();
+                             remplirTitre()">
+              {{ s.label }}
+            </button>
+          </div>
+        </div>
+
+        <!-- FORMAT -->
+        <div class="form-section">
+          <div class="fs-title">⚡ Format du match</div>
+          <div class="format-row">
+            <button *ngFor="let f of getFormats()"
+                    class="format-btn"
+                    [class.active]="form.format === f"
+                    type="button"
+                    (click)="form.format = f;
+                             updateNbJoueurs();
+                             remplirTitre()">
+              {{ f }}
+            </button>
+          </div>
+        </div>
+
+        <div class="form-grid">
+
+          <div class="sp-field full">
+            <label class="form-label">
+              ✏️ Titre du match *
+            </label>
+            <input type="text" class="form-input"
+                   [(ngModel)]="form.titre"
+                   [placeholder]="getTitreSuggere()">
+          </div>
+
+          <div class="sp-field">
+            <label class="form-label">📅 Date *</label>
+            <input type="date" class="form-input"
+                   [(ngModel)]="form.date"
+                   [min]="today">
+          </div>
+
+          <div class="sp-field">
+            <label class="form-label">🕐 Heure *</label>
+            <input type="time" class="form-input"
+                   [(ngModel)]="form.heure">
+          </div>
+
+          <div class="sp-field">
+            <label class="form-label">
+              👥 Nombre de joueurs *
+            </label>
+            <input type="number" class="form-input"
+                   [(ngModel)]="form.nbJoueursMax"
+                   min="2" max="22">
+          </div>
+
+          <div class="sp-field">
+            <label class="form-label">📊 Niveau</label>
+            <select class="form-input"
+                    [(ngModel)]="form.niveau">
+              <option *ngFor="let n of niveaux"
+                      [value]="n.value">
+                {{ n.label }}
+              </option>
+            </select>
+          </div>
+
+          <div class="sp-field full">
+            <label class="form-label">
+              🏟️ Terrain (optionnel)
+            </label>
+            <select class="form-input"
+                    [(ngModel)]="form.terrainId">
+              <option value="">
+                — Sélectionner un terrain —
+              </option>
+              <option *ngFor="let t of terrains"
+                      [value]="t.id">
+                {{ t.nom }} ({{ t.type }})
+              </option>
+            </select>
+          </div>
+
+          <div class="sp-field full">
+            <label class="form-label">
+              📝 Description (optionnel)
+            </label>
+            <textarea class="form-input"
+                      [(ngModel)]="form.description"
+                      placeholder="Ex: Match amical..."
+                      rows="3">
+            </textarea>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-primary"
+                  (click)="soumettre()"
+                  [disabled]="loading">
+            {{ loading
+               ? '⏳ Création...'
+               : '✅ Créer le match' }}
+          </button>
+          <a routerLink="/user/matchs"
+             class="btn btn-secondary">
+            Annuler
+          </a>
+        </div>
+
+      </div>
+
+      <!-- APERÇU -->
+      <div class="preview-card anim-fade-up">
+        <div class="section-title"
+             style="margin-bottom:1rem">
+          👁️ Aper

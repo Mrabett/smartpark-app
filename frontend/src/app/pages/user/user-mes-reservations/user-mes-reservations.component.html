@@ -1,0 +1,164 @@
+<div class="user-page">
+
+  
+
+  <div class="page-content">
+
+    <!-- HERO -->
+    <div class="sp-hero anim-fade-up">
+      <div>
+        <h1>Mes <span>Réservations</span></h1>
+        <p>
+          <span class="live-dot"></span>
+          {{ getCount('TOUS') }} réservation(s) au total
+        </p>
+      </div>
+      <a routerLink="/user/terrains" class="btn btn-primary">
+        ➕ Nouvelle réservation
+      </a>
+    </div>
+
+    <!-- ERREUR -->
+    <div *ngIf="erreur" class="alert alert-error" style="margin-bottom:1rem">
+      ⚠️ {{ erreur }}
+    </div>
+
+    <!-- MESSAGE -->
+    <div *ngIf="message"
+         class="alert"
+         [ngClass]="messageType === 'success' ? 'alert-success' : 'alert-error'"
+         style="margin-bottom:1rem">
+      {{ message }}
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid anim-fade-up anim-delay-1">
+      <div class="stat-card green">
+        <div class="stat-header">
+          <span class="stat-label">Confirmées</span>
+          <div class="stat-icon green">✅</div>
+        </div>
+        <div class="stat-value green">{{ getCount('CONFIRMEE') }}</div>
+        <div class="stat-sub">réservations actives</div>
+      </div>
+
+      <div class="stat-card amber">
+        <div class="stat-header">
+          <span class="stat-label">En attente</span>
+          <div class="stat-icon amber">⏳</div>
+        </div>
+        <div class="stat-value amber">{{ getCount('EN_ATTENTE') }}</div>
+        <div class="stat-sub">en cours de traitement</div>
+      </div>
+
+      <div class="stat-card red">
+        <div class="stat-header">
+          <span class="stat-label">Annulées</span>
+          <div class="stat-icon red">❌</div>
+        </div>
+        <div class="stat-value red">{{ getCount('ANNULEE') }}</div>
+        <div class="stat-sub">réservations annulées</div>
+      </div>
+
+      <div class="stat-card purple">
+        <div class="stat-header">
+          <span class="stat-label">Total dépensé</span>
+          <div class="stat-icon purple">💰</div>
+        </div>
+        <div class="stat-value purple">{{ getTotalDepense() }}</div>
+        <div class="stat-sub">DT confirmées</div>
+      </div>
+    </div>
+
+    <!-- CARD RESERVATIONS -->
+    <div class="sp-card anim-fade-up anim-delay-2">
+
+      <!-- FILTRES -->
+      <div class="section-header">
+        <div class="section-title">📅 Mes Réservations</div>
+        <button class="btn btn-ghost"
+                style="font-size:0.78rem;padding:5px 12px"
+                (click)="load()">
+          🔄 Actualiser
+        </button>
+      </div>
+
+      <div class="filtres-row">
+        <button *ngFor="let f of filtres"
+                class="btn-filtre"
+                [class.active]="filtreActif === f.value"
+                (click)="filtrer(f.value)">
+          {{ f.label }}
+          <span class="filtre-count">{{ getCount(f.value) }}</span>
+        </button>
+      </div>
+
+      <!-- LOADING -->
+      <div *ngIf="loading" class="empty-state">
+        <div class="empty-icon">⏳</div>
+        <p>Chargement de vos réservations...</p>
+      </div>
+
+      <!-- VIDE -->
+      <div *ngIf="!loading && reservationsFiltrees.length === 0"
+           class="empty-state">
+        <div class="empty-icon">📅</div>
+        <h3>Aucune réservation</h3>
+        <p>
+          {{ filtreActif === 'TOUS'
+             ? 'Vous n\'avez pas encore de réservations.'
+             : 'Aucune réservation avec ce statut.' }}
+        </p>
+        <a routerLink="/user/terrains"
+           class="btn btn-primary" style="margin-top:1rem">
+          🏟️ Réserver un terrain
+        </a>
+      </div>
+
+      <!-- LISTE -->
+      <div class="res-liste" *ngIf="!loading && reservationsFiltrees.length > 0">
+        <div class="res-item anim-slide-in"
+             *ngFor="let r of reservationsFiltrees">
+
+          <!-- Avatar -->
+          <div class="res-avatar">
+            {{ getInitials(r.clientNom) }}
+          </div>
+
+          <!-- Infos -->
+          <div class="res-info">
+            <div class="res-nom">{{ r.terrainNom || r.terrainId }}</div>
+            <div class="res-meta">
+              <span class="res-tag">📅 {{ r.dateReservation }}</span>
+              <span class="res-tag">🕐 {{ r.heureDebut }} → {{ r.heureFin }}</span>
+              <span class="res-tag" *ngIf="r.notes">📝 {{ r.notes }}</span>
+            </div>
+          </div>
+
+          <!-- Montant + Statut -->
+          <div class="res-right">
+            <div class="res-montant">{{ r.montantTotal | number:'1.0-0' }} DT</div>
+            <span class="badge" [ngClass]="getBadgeClass(r.statut)">
+              {{ r.statut }}
+            </span>
+          </div>
+
+          <!-- Actions -->
+          <div class="res-actions">
+            <button class="btn btn-danger btn-sm"
+                    *ngIf="r.statut !== 'ANNULEE'"
+                    (click)="annuler(r.id!)">
+              ❌ Annuler
+            </button>
+            <button class="btn btn-ghost btn-sm"
+                    (click)="delete(r.id!)">
+              🗑️
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

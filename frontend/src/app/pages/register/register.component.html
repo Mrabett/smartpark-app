@@ -1,0 +1,84 @@
+<div class="auth-page">
+  <div class="auth-card">
+
+    <div class="auth-logo">
+      <div class="logo-icon">⚽</div>
+      <span>SmartPark</span>
+    </div>
+
+    <h1>Créer un compte</h1>
+    <p class="auth-sub">Rejoignez SmartPark et réservez vos terrains</p>
+
+    <div *ngIf="erreur" class="alert-error">⚠️ {{ erreur }}</div>
+
+    <form (ngSubmit)="register()">
+
+      <div class="form-group">
+        <label class="form-label">👤 Nom complet *</label>
+        <input class="form-input"
+               [(ngModel)]="nom" name="nom" required
+               placeholder="ex: Ahmed Ben Ali">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">📧 Email *</label>
+        <input type="email" class="form-input"
+               [(ngModel)]="email" name="email" required
+               placeholder="votre@email.com">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">📱 Téléphone *</label>
+        <input class="form-input"
+               [(ngModel)]="telephone" name="telephone" required
+               placeholder="ex: 55 123 456">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">🔒 Mot de passe *</label>
+        <input type="password" class="form-input"
+               [(ngModel)]="password" name="password" required
+               placeholder="Min. 6 caractères">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">🔒 Confirmer mot de passe *</label>
+        <input type="password" class="form-input"
+               [(ngModel)]="password2" name="password2" required
+               placeholder="Répétez le mot de passe">
+      </div>
+
+      <!-- Indicateur force mot de passe -->
+      <div class="password-strength" *ngIf="password.length > 0">
+        <div class="strength-bar">
+          <div class="strength-fill"
+               [style.width]="password.length >= 8 ? '100%'
+                 : password.length >= 6 ? '66%' : '33%'"
+               [style.background]="password.length >= 8
+                 ? 'var(--green)' : password.length >= 6
+                   ? 'var(--amber)' : 'var(--red)'">
+          </div>
+        </div>
+        <span [style.color]="password.length >= 8
+                ? 'var(--green)' : password.length >= 6
+                  ? 'var(--amber)' : 'var(--red)'">
+          {{ password.length >= 8 ? 'Fort' :
+             password.length >= 6 ? 'Moyen' : 'Faible' }}
+        </span>
+      </div>
+
+      <button type="submit" class="btn btn-primary auth-btn"
+              [disabled]="loading">
+        {{ loading ? '⏳ Création...' : '✅ Créer mon compte' }}
+      </button>
+
+    </form>
+
+    <div class="auth-divider"><span>Déjà un compte ?</span></div>
+
+    <a routerLink="/login" class="btn btn-ghost auth-btn">
+      🔐 Se connecter
+    </a>
+
+  </div>
+</div>
